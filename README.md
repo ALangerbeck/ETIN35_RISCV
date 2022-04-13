@@ -7,6 +7,19 @@ Project repository for the second project in the course IC-Project 1 given at LT
 ## Todo
 
 - [ ] RISC-V implementation
-  - [ ] example
+  - [ ] VHD Testbench
+  - [ ] Implement instruction
+    - [ ] RV32I
+      - [ ] Shifts
+      - [ ] Aritmetic
+      - [ ] Logical
+      - [ ] Comapre
+      - [ ] Branch
+    - [ ] RV32C
+      - [ ] Loads
+      - [ ] Stores
+      - [ ] extra: floating point rellated
+    - [ ] extra: RV32f
+- [ ] Implement Massoud's Auxiliaries
 - [ ] Assembler Extension
   - [ ] example
