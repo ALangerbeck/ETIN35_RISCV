@@ -20,6 +20,6 @@ Project repository for the second project in the course IC-Project 1 given at LT
       - [ ] Stores
       - [ ] extra: floating point rellated
     - [ ] extra: RV32f
-- [ ] Implement Massoud's Auxiliaries
+- [ ] Import Massoud's Auxiliaries
 - [ ] Assembler Extension
 - [ ] 
