@@ -6,14 +6,7 @@ Project repository for the second project in the course IC-Project 1 given at LT
 
 ## Todo
 
-<<<<<<< HEAD
 - [ ] RISC-V implementation
   - [ ] example
 - [ ] Assembler Extension
   - [ ] example
-=======
-- [x] RISC-V implementation
-  - [] example
-- [] Assembler Extension
-  - [] example
->>>>>>> 55ba863128a4267cb2e8377dba0855f105eca14c
