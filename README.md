@@ -7,7 +7,8 @@ Project repository for the second project in the course IC-Project 1 given at LT
 ## Todo
 
 - [ ] RISC-V implementation
-  - [ ] VHD Testbench
+  - [ ] Implementing stages
+  - [ ] VHD Test bench
   - [ ] Implement instruction
     - [ ] RV32I
       - [ ] Shifts
@@ -20,5 +21,5 @@ Project repository for the second project in the course IC-Project 1 given at LT
       - [ ] Stores
       - [ ] extra: floating point rellated
     - [ ] extra: RV32f
-- [ ] Import Massoud's Auxiliaries
-- [ ] Assembler Extension
+- [x] Import Massoud's Auxiliaries
+- [ ] Extra :Assembler Extension
