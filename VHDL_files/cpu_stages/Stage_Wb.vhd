@@ -6,7 +6,7 @@ entity stage_wb is
     generic(DATA_WIDTH: integer := 32);
 
     port(
-        
+        Data  : inout std_logic
     );
 end stage_wb;
 
