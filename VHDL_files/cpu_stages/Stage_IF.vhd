@@ -1,12 +1,14 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.common.all;
 
 entity stage_if is
-    generic(DATA_WIDTH: integer := 32);
+    generic(PROGRAM_ADDRESS_WIDTH: natural := 6);
 
     port(
-        Data  : inout std_logic
+        program_read : in std_logic_vector(INSTRUCTION_WIDTH-1 downto 0);
+        pc: out std_logic_vector(PROGRAM_ADDRESS_WIDTH-1 downto 0)
     );
 end stage_if;
 

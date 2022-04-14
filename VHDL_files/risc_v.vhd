@@ -5,12 +5,6 @@ use work.common.all;
 
 
 entity ph_risc_v is    
-    generic(
-        PROGRAM_ADDRESS_WIDTH: natural := 6;
-        DATA_ADDRESS_WIDTH: natural := 6;
-        CPU_DATA_WIDTH: natural := 32;
-        REGISTER_FILE_ADDRESS_WIDTH: natural := 5
-    );
     
     port(
         clk: in std_logic;

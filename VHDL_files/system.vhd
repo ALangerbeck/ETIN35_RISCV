@@ -5,11 +5,6 @@ use work.common.all;
 
 
 entity system is
-    generic (
-        PROGRAM_ADDRESS_WIDTH: natural := 10;
-        DATA_ADDRESS_WIDTH: natural := 6;
-        CPU_DATA_WIDTH: natural := 32
-    );
     
     port (
         clk: in std_logic;
@@ -31,12 +26,6 @@ architecture structural of system is
 begin
 
     cpu: entity work.ph_risc_v 
-        generic map (
-            PROGRAM_ADDRESS_WIDTH => PROGRAM_ADDRESS_WIDTH,
-            DATA_ADDRESS_WIDTH => DATA_ADDRESS_WIDTH,
-            CPU_DATA_WIDTH => CPU_DATA_WIDTH,
-            REGISTER_FILE_ADDRESS_WIDTH => 5
-        )
         port map (
             clk => clk,
             reset_n => reset_n,
@@ -49,10 +38,6 @@ begin
         );
     
     prog_mem: entity work.program_memory 
-        generic map (
-                ADDRESS_WIDTH => PROGRAM_ADDRESS_WIDTH,
-                DATA_WIDTH => INSTRUCTION_WIDTH
-            )    
         port map (
             clk => clk,
             write_en => '0',
@@ -62,10 +47,6 @@ begin
         );
 
     data_mem: entity work.data_memory 
-        generic map (
-            ADDRESS_WIDTH => DATA_ADDRESS_WIDTH,
-            DATA_WIDTH => CPU_DATA_WIDTH
-        )
         port map (
             clk => clk,
             write_en => data_write_en,

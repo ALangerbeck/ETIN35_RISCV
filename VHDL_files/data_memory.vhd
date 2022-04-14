@@ -1,14 +1,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.common.all;
 
 
-entity data_memory is
-    generic (
-        ADDRESS_WIDTH: natural := 6;
-        DATA_WIDTH: natural := 32
-    );
-    
+entity data_memory is    
     port (
         clk: in std_logic;
         write_en: in std_logic;

@@ -2,13 +2,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use std.textio.all;
-
+use work.common.all;
 
 entity program_memory is
-    generic (
-        ADDRESS_WIDTH: natural := 6;
-        DATA_WIDTH: natural := 32
-    );
     
     port (
         clk: in std_logic;
