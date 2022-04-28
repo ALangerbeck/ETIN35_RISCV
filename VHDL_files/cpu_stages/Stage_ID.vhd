@@ -5,11 +5,15 @@ use work.common.all;
 
 entity stage_id is
     port(
-        pc_in : in std_logic_vector(PROGRAM_ADDRESS_WIDTH-1 downto 0);
-        instruction_out : in std_logic_vector(INSTRUCTION_WIDTH-1 downto 0);
         clk : in std_logic;
-        reset_n : in std_logic
+        reset_n : in std_logic;
+        pc_in : in std_logic_vector(PROGRAM_ADDRESS_WIDTH-1 downto 0);
+        instruction_in : in std_logic_vector(INSTRUCTION_WIDTH-1 downto 0); 
+        rd_from_wb : in std_logic_vector(4 downto 0);
+        write_en_from_wb : in std_logic;
+        result_from_wb : in std_logic_vector(DATA_WIDTH-1 downto 0); 
         
+        op_code : out std_logic_vector(6 downto 0) -- needed for the control unit, might need funct3 or funct7 as well
     );
 end stage_id;
 
@@ -17,42 +21,73 @@ architecture behavioral of stage_id is
 
 -- TYPE DEFINITIONS
 
- type instruction is record
+ type instruction_type is record
         opcode: std_logic_vector(6 downto 0);
         rd : std_logic_vector(4 downto 0);
         funct3 : std_logic_vector(2 downto 0);
         rs1 : std_logic_vector(4 downto 0);
         rs2 : std_logic_vector(4 downto 0);
         funct7 : std_logic_vector(6 downto 0);
- end record instruction;
+ end record instruction_type;
 
 -- SIGNAL DEFINITIONS
 
-
-signal inst_opcode : std_logic_vector(6 downto 0);
+--Double check that the read of the register file happens asynchronously
+signal read_data_one, read_data_two : std_logic_vector(DATA_WIDTH-1 downto 0);
+signal instruction : instruction_type;
+signal imm_gen_in : std_logic_vector(11 downto 0);
+signal imm_gen_out : std_logic_vector(DATA_WIDTH-1 downto 0);
 
 -- COMPONENT DEFINITION
 
+component sign_extender is 
+    generic( I: integer;
+             O: integer);
+    port (  
+            input : in std_logic_vector(I-1 downto 0);
+            output  : out std_logic_vector(O-1 downto 0)
+         );
+end component; 
 
 begin
 
-reg_file: entity work.register_file 
-        generic map (
-            DATA_WIDTH => CPU_DATA_WIDTH,
-            ADDRESS_WIDTH => REGISTER_FILE_ADDRESS_WIDTH
-        )
-        port map (
-            clk => clk,
-            reset_n => reset_n,
-            write_en => open,
-            read1_id => open,
-            read2_id => open,
-            write_id => open,
-            write_data => open,
-            read1_data => open,
-            read2_data => open
-        );
+    instruction <= (  opcode  => instruction_in(6 downto 0),
+                      rd => instruction_in(11 downto 7),
+                      funct3 => instruction_in(14 downto 12),
+                      rs1 => instruction_in(19 downto 15),
+                      rs2 => instruction_in(24 downto 20),
+                      funct7=> instruction_in(31 downto 25));
+                      
+    immediate_genarator : process(instruction.opcode)
+    begin
+        if(instruction.opcode = L_FORMAT or instruction.opcode = I_FORMAT) then 
+            imm_gen_in <=  instruction.funct7 & instruction.rs2;
+        elsif(instruction.opcode = S_FORMAT) then 
+            imm_gen_in <= instruction.funct7 & instruction.rd;
+        else 
+            imm_gen_in <= (others => '0');
+        end if;
+    end process;
 
+    reg_file: entity work.register_file 
+    port map (
+        clk => clk,
+        reset_n => reset_n,
+        write_en => write_en_from_wb,
+        read1_id => instruction.rs1,
+        read2_id => instruction.rs2,
+        write_id => rd_from_wb,
+        write_data => result_from_wb,
+        read1_data => open,
+        read2_data => open
+    );
 
+    inst_sign_extender : sign_extender
+    generic map ( I => 12,
+                  O => 32)
+    port map (  
+            input => imm_gen_in,
+            output  => imm_gen_out
+         );
 
 end behavioral;

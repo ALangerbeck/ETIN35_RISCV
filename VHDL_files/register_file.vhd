@@ -1,13 +1,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.common.all;
+
 
 
 entity register_file is
-    generic(
-        DATA_WIDTH: integer := 32;
-        ADDRESS_WIDTH: integer := 5
-    );
     
     port(
         clk: in std_logic;

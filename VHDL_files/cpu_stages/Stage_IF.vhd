@@ -27,7 +27,7 @@ component reg is
     generic( W: integer);
     port(
         clk     : in std_logic;
-        rst     : in std_logic;
+        n_rst     : in std_logic;
         next_out : in std_logic_vector(W-1 downto 0);
         output  : out std_logic_vector(W-1 downto 0)
     );
