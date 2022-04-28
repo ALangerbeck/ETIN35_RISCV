@@ -5,8 +5,6 @@ use work.common.all;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity stage_if is
-    generic(PROGRAM_ADDRESS_WIDTH: natural := 6);
-
     port(
         clk : in std_logic;
         rst : in std_logic;
@@ -54,22 +52,22 @@ begin
     
     program_counter : process(mux_control, pc, pc_branch)
     begin
-    if (mux_control = '0') then 
-        pc_next <= pc +4;
-    elsif (mux_control = '1') then
-        pc_next <= pc_branch;
-    end if;
+        if (mux_control = '0') then 
+            pc_next <= pc +4;
+        elsif (mux_control = '1') then
+            pc_next <= pc_branch;
+        end if;
         
     end process;
 
-    prog_mem: entity work.program_memory 
-        port map (
-            clk => clk,
-            write_en => '0',
-            write_data => (others => '0'),
-            address => pc,
-            read_data => instruction
-        );
+prog_mem: entity work.program_memory 
+    port map (
+        clk => clk,
+        write_en => '0',
+        write_data => (others => '0'),
+        address => pc,
+        read_data => instruction
+    );
 
  pc_reg : reg 
     generic map ( W => PROGRAM_ADDRESS_WIDTH)
