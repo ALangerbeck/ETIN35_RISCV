@@ -29,21 +29,10 @@ begin
         port map (
             clk => clk,
             reset_n => reset_n,
-            program_read => program_data,
-            pc => program_address,
             data_address => data_address,
             data_read => data_read,
             data_write_en => data_write_en,
             data_write => data_write
-        );
-    
-    prog_mem: entity work.program_memory 
-        port map (
-            clk => clk,
-            write_en => '0',
-            write_data => (others => '0'),
-            address => program_address,
-            read_data => program_data
         );
 
     data_mem: entity work.data_memory 
