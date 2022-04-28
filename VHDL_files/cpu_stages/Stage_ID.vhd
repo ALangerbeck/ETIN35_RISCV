@@ -2,6 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.common.all;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
 
 entity stage_id is
     port(
@@ -13,6 +15,7 @@ entity stage_id is
         write_en_from_wb : in std_logic;
         result_from_wb : in std_logic_vector(DATA_WIDTH-1 downto 0); 
         
+        immediate_out : out std_logic_vector(DATA_WIDTH-1 downto 0);
         op_code : out std_logic_vector(6 downto 0) -- needed for the control unit, might need funct3 or funct7 as well
     );
 end stage_id;
@@ -36,7 +39,7 @@ architecture behavioral of stage_id is
 signal read_data_one, read_data_two : std_logic_vector(DATA_WIDTH-1 downto 0);
 signal instruction : instruction_type;
 signal imm_gen_in : std_logic_vector(11 downto 0);
-signal imm_gen_out : std_logic_vector(DATA_WIDTH-1 downto 0);
+signal imm_gen_out, imm_gen_shifted : std_logic_vector(DATA_WIDTH-1 downto 0);
 
 -- COMPONENT DEFINITION
 
@@ -58,8 +61,9 @@ begin
                       rs2 => instruction_in(24 downto 20),
                       funct7=> instruction_in(31 downto 25));
                       
-    immediate_genarator : process(instruction.opcode)
+    immediate_genarator : process(instruction.opcode) --only implemented to check a few opcodes, might need to be extended. 
     begin
+        immediate_out <= imm_gen_out;
         if(instruction.opcode = L_FORMAT or instruction.opcode = I_FORMAT) then 
             imm_gen_in <=  instruction.funct7 & instruction.rs2;
         elsif(instruction.opcode = S_FORMAT) then 
@@ -68,7 +72,13 @@ begin
             imm_gen_in <= (others => '0');
         end if;
     end process;
-
+    
+    pc_branch : process(imm_gen_out, pc_in)
+    begin 
+        imm_gen_shifted <= imm_gen_out(DATA_WIDTH -1 downto 1) & '0'; --unsure if this is the correct left shift one that they want us to do. Double check later. 
+        --pc_branch_out <= imm_gen_shifted + pc_in; unsure of how to do this. 
+    end process;
+    
     reg_file: entity work.register_file 
     port map (
         clk => clk,
@@ -78,8 +88,8 @@ begin
         read2_id => instruction.rs2,
         write_id => rd_from_wb,
         write_data => result_from_wb,
-        read1_data => open,
-        read2_data => open
+        read1_data => read_data_one,
+        read2_data => read_data_two
     );
 
     inst_sign_extender : sign_extender
