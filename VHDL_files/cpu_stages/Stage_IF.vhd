@@ -5,8 +5,6 @@ use work.common.all;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity stage_if is
-    generic(PROGRAM_ADDRESS_WIDTH: natural := 6);
-
     port(
         clk : in std_logic;
         rst : in std_logic;
