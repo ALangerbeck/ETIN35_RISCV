@@ -75,7 +75,7 @@ begin
     generic map ( W => PROGRAM_ADDRESS_WIDTH)
     port map(
         clk     => clk,
-        rst     => rst,
+        n_rst     => rst,
         next_out => pc_next,
         output  => pc
         );
