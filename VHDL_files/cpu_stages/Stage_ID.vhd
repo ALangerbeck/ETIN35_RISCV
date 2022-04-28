@@ -15,6 +15,24 @@ end stage_id;
 
 architecture behavioral of stage_id is
 
+-- TYPE DEFINITIONS
+
+ type instruction is record
+        opcode: std_logic_vector(6 downto 0);
+        rd : std_logic_vector(4 downto 0);
+        funct3 : std_logic_vector(2 downto 0);
+        rs1 : std_logic_vector(4 downto 0);
+        rs2 : std_logic_vector(4 downto 0);
+        funct7 : std_logic_vector(6 downto 0);
+ end record instruction;
+
+-- SIGNAL DEFINITIONS
+
+
+signal inst_opcode : std_logic_vector(6 downto 0);
+
+-- COMPONENT DEFINITION
+
 
 begin
 
@@ -26,13 +44,13 @@ reg_file: entity work.register_file
         port map (
             clk => clk,
             reset_n => reset_n,
-            write_en => mem_wb_reg.control_reg_write,
-            read1_id => if_id_reg.instruction.rs1,
-            read2_id => if_id_reg.instruction.rs2,
-            write_id => mem_wb_reg.register_file_rd,
-            write_data => wb_register_file_write_data,
-            read1_data => id_register_file_read1_data,
-            read2_data => id_register_file_read2_data
+            write_en => open,
+            read1_id => open,
+            read2_id => open,
+            write_id => open,
+            write_data => open,
+            read1_data => open,
+            read2_data => open
         );
 
 
