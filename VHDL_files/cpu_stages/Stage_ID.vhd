@@ -15,8 +15,15 @@ entity stage_id is
         write_en_from_wb : in std_logic;
         result_from_wb : in std_logic_vector(DATA_WIDTH-1 downto 0); 
         
+        comp : out std_logic;
+        pc_branch_out : out std_logic_vector(PROGRAM_ADDRESS_WIDTH-1 downto 0);
         immediate_out : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        op_code : out std_logic_vector(6 downto 0) -- needed for the control unit, might need funct3 or funct7 as well
+        op_code : out std_logic_vector(6 downto 0);
+        funct3 : out std_logic_vector(2 downto 0);
+        funct7 : out std_logic_vector(6 downto 0);
+        rd : out std_logic_vector(4 downto 0);
+        data_one : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        data_two : out std_logic_vector(DATA_WIDTH-1 downto 0)
     );
 end stage_id;
 
@@ -61,6 +68,13 @@ begin
                       rs2 => instruction_in(24 downto 20),
                       funct7=> instruction_in(31 downto 25));
                       
+    op_code <= instruction.opcode;
+    funct3 <= instruction.funct3;
+    funct7 <= instruction.funct7;
+    rd <= instruction.rd;
+    data_one <= read_data_one;
+    data_two <= read_data_two;
+    
     immediate_genarator : process(instruction.opcode) --only implemented to check a few opcodes, might need to be extended. 
     begin
         immediate_out <= imm_gen_out;
@@ -76,9 +90,18 @@ begin
     pc_branch : process(imm_gen_out, pc_in)
     begin 
         imm_gen_shifted <= imm_gen_out(DATA_WIDTH -1 downto 1) & '0'; --unsure if this is the correct left shift one that they want us to do. Double check later. 
-        --pc_branch_out <= imm_gen_shifted + pc_in; unsure of how to do this. 
+        pc_branch_out <= imm_gen_shifted(PROGRAM_ADDRESS_WIDTH-1 downto 0) + pc_in;
     end process;
     
+    comparator : process(read_data_one, read_data_two)
+    begin
+        if(read_data_one = read_data_two) then 
+            comp <= '1';
+        else 
+            comp <= '0';
+        end if;
+    end process;
+     
     reg_file: entity work.register_file 
     port map (
         clk => clk,
