@@ -1,11 +1,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.common.all;
 
 
 entity alu is
-    generic(DATA_WIDTH: integer := 32);
-
     port(
         control: in std_logic_vector(2 downto 0);
         left_operand: in std_logic_vector(DATA_WIDTH-1 downto 0);
