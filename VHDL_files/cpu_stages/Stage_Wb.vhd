@@ -1,12 +1,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.common.all;
 
 entity stage_wb is
-    generic(DATA_WIDTH: integer := 32);
-
     port(
-        Data  : inout std_logic
+        ALU_result : in std_logic_vector(DATA_WIDTH-1 downto 0)
+        
     );
 end stage_wb;
 

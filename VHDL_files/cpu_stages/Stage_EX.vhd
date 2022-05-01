@@ -23,16 +23,16 @@ architecture behavioral of stage_ex is
 
 -- SIGNAL DEFINITIONS
 
-signal chosen_right_operand : std_logic_vector(DATA_WIDTH-1 downto 0);
+signal chosen_second_operand : std_logic_vector(DATA_WIDTH-1 downto 0);
 
 begin
-
+        
     control_right_operand : process(data_two, immediate, mux_control)
     begin 
         if(mux_control = '0') then 
-            chosen_right_operand <= data_two;
+            chosen_second_operand <= data_two;
         else 
-            chosen_right_operand <= immediate;
+            chosen_second_operand <= immediate;
         end if;
     end process;
 
@@ -40,7 +40,7 @@ begin
     port map(
         control => ALU_control,
         left_operand => data_one, 
-        right_operand => chosen_right_operand,
+        right_operand => chosen_second_operand,
         zero => zero, 
         result => result
     );

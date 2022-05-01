@@ -29,19 +29,7 @@ begin
         port map (
             clk => clk,
             reset_n => reset_n,
-            data_address => data_address,
-            data_read => data_read,
-            data_write_en => data_write_en,
             data_write => data_write
-        );
-
-    data_mem: entity work.data_memory 
-        port map (
-            clk => clk,
-            write_en => data_write_en,
-            write_data => data_write,
-            address => data_address,
-            read_data => data_read
         );
     
     -- Just added to force the tools not to optimize away the logic

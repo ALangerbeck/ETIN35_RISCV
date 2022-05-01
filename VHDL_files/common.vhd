@@ -17,4 +17,5 @@ package common is
     constant L_FORMAT : std_logic_vector(6 downto 0) := "0000011";
     constant S_FORMAT : std_logic_vector(6 downto 0) := "0100011";
     constant B_FORMAT : std_logic_vector(6 downto 0) := "1100011";
+    constant NOP : std_logic_vector(DATA_WIDTH -1 downto 0) := "00000000000000000000000000110011"; --should be an 
 end common;

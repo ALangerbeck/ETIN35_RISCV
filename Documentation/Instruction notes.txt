@@ -1,0 +1,3 @@
+LW - load word instruction. Adds rs1 + immediate for memory address, then sends it to mem stage. It has a rd, for the register to write the
+read value to. 
+SW - store word instruction. Adds rs1 + immediate for memory address, then stores value at rs2 at that address. 
