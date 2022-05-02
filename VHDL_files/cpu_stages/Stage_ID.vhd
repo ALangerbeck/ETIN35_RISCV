@@ -75,7 +75,7 @@ begin
     data_one <= read_data_one;
     data_two <= read_data_two;
     
-    immediate_genarator : process(instruction.opcode) --only implemented to check a few opcodes, might need to be extended. 
+    immediate_genarator : process(instruction.opcode,imm_gen_out) --only implemented to check a few opcodes, might need to be extended. 
     begin
         immediate_out <= imm_gen_out;
         if(instruction.opcode = L_FORMAT or instruction.opcode = I_FORMAT) then 
@@ -83,13 +83,13 @@ begin
         elsif(instruction.opcode = S_FORMAT) then 
             imm_gen_in <= instruction.funct7 & instruction.rd;
         elsif(instruction.opcode = B_FORMAT) then 
-            imm_gen_in <= instruction.funct7(6) & instruction.funct3(0) & instruction.funct7(5 downto 0) & instruction.funct3(2 downto 1);
+            imm_gen_in <= instruction.funct7(6) & instruction.rd(0) & instruction.funct7(5 downto 0) & instruction.rd(4 downto 1);
         else 
             imm_gen_in <= (others => '0');
         end if;
     end process;
     
-    pc_branch : process(imm_gen_out, pc_in)
+    pc_branch : process(imm_gen_out, pc_in,imm_gen_shifted)
     begin 
         imm_gen_shifted <= imm_gen_out(DATA_WIDTH -1 downto 1) & '0'; --unsure if this is the correct left shift one that they want us to do. Double check later. 
         pc_branch_out <= imm_gen_shifted(PROGRAM_ADDRESS_WIDTH-1 downto 0) + pc_in;

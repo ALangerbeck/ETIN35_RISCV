@@ -145,8 +145,8 @@ begin
         rst             => reset_n,
         mux_control     => mux_control_pc,
         pc_branch       => pc_branch,
-        instruction_out => reg_block_one_next.pc,
-        pc_out          => reg_block_one_next.instruction
+        instruction_out => reg_block_one_next.instruction,
+        pc_out          => reg_block_one_next.pc
     );
     
 -- because of the way the register file works, incase we want to read from a reg in decode stage, when we are writing to that reg in wb stage, it has

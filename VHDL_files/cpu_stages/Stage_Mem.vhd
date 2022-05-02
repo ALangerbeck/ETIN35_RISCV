@@ -25,7 +25,7 @@ begin
         clk => clk, 
         write_en => write_en,
         write_data => data_two, 
-        address => result, 
+        address => result(ADDRESS_WIDTH-1 downto 0), 
         read_data => read_data
     );
 

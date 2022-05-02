@@ -11,6 +11,7 @@ package common is
     constant REGISTER_FILE_ADDRESS_WIDTH: natural := 5;
     constant DATA_WIDTH: natural := 32;
     constant ADDRESS_WIDTH: natural := 6;
+    constant ADDRESS_WIDTH_REG_FILE: natural := 5;
     
     constant R_FORMAT : std_logic_vector(6 downto 0) := "0110011";
     constant I_FORMAT : std_logic_vector(6 downto 0) := "0010011";

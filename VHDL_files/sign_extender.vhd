@@ -18,7 +18,7 @@ signal temporary : std_logic_vector(O-1 downto 0);
 
 begin
 
-    sign_extension : process(input) 
+    sign_extension : process(input,temporary) 
     begin 
         if(input(I-1)='0') then 
             temporary <= (others => '0');

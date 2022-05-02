@@ -11,9 +11,9 @@ entity register_file is
         clk: in std_logic;
         reset_n: in std_logic;
         write_en: in std_logic;
-        read1_id: in std_logic_vector(ADDRESS_WIDTH-1 downto 0);
-        read2_id: in std_logic_vector(ADDRESS_WIDTH-1 downto 0);
-        write_id: in std_logic_vector(ADDRESS_WIDTH-1 downto 0);
+        read1_id: in std_logic_vector(ADDRESS_WIDTH_REG_FILE-1 downto 0);
+        read2_id: in std_logic_vector(ADDRESS_WIDTH_REG_FILE-1 downto 0);
+        write_id: in std_logic_vector(ADDRESS_WIDTH_REG_FILE-1 downto 0);
         write_data: in std_logic_vector(DATA_WIDTH-1 downto 0);
         read1_data: out std_logic_vector(DATA_WIDTH-1 downto 0);
         read2_data: out std_logic_vector(DATA_WIDTH-1 downto 0)
@@ -22,7 +22,7 @@ end register_file;
 
 architecture behavioral of register_file is
 
-    constant REGISTER_FILE_SIZE: natural := 2 ** ADDRESS_WIDTH;
+    constant REGISTER_FILE_SIZE: natural := 2 ** ADDRESS_WIDTH_REG_FILE;
 
     type register_array is array (0 to REGISTER_FILE_SIZE-1) of std_logic_vector(DATA_WIDTH-1 downto 0);
     signal registers: register_array := ( others => (others => '0'));
