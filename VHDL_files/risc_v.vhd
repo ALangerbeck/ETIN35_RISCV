@@ -70,6 +70,7 @@ signal wb_result : std_logic_vector(DATA_WIDTH-1 downto 0);
 
 begin
     
+    
     reg_block_three_next.rd <= reg_block_two_out.rd;
     reg_block_three_next.data_two <= reg_block_two_out.data_two;
     reg_block_three_next.write_mem_enable <= reg_block_two_out.write_mem_enable;
@@ -119,8 +120,8 @@ begin
     begin 
         reg_block_two_next.write_back_enable <= '0';
         reg_block_two_next.mux_control_result <= '0'; --- means ALU_result
-        if(op_code = R_FORMAT or op_code = S_FORMAT or op_code = I_FORMAT) then
-            reg_block_two_next.write_back_enable <= '0';
+        if(op_code = R_FORMAT or op_code = L_FORMAT or op_code = I_FORMAT) then
+            reg_block_two_next.write_back_enable <= '1';
         end if; 
         if(op_code = S_FORMAT) then 
             reg_block_two_next.mux_control_result <= '1';
@@ -130,8 +131,10 @@ begin
     write_back : process(reg_block_four_out.mux_control_result)
     begin 
         if(reg_block_four_out.mux_control_result = '0') then 
+            data_write <= reg_block_four_out.ALU_result; --for redundancy
             wb_result <= reg_block_four_out.ALU_result;
         else 
+            data_write <= reg_block_four_out.read_data; --for redundancy
             wb_result <= reg_block_four_out.read_data;
         end if;
     end process;

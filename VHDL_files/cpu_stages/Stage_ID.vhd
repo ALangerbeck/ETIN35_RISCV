@@ -82,6 +82,8 @@ begin
             imm_gen_in <=  instruction.funct7 & instruction.rs2;
         elsif(instruction.opcode = S_FORMAT) then 
             imm_gen_in <= instruction.funct7 & instruction.rd;
+        elsif(instruction.opcode = B_FORMAT) then 
+            imm_gen_in <= instruction.funct7(6) & instruction.funct3(0) & instruction.funct7(5 downto 0) & instruction.funct3(2 downto 1);
         else 
             imm_gen_in <= (others => '0');
         end if;
