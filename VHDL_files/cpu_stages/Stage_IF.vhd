@@ -53,7 +53,7 @@ begin
     program_counter : process(mux_control, pc, pc_branch)
     begin
         if (mux_control = '0') then 
-            pc_next <= pc +4;
+            pc_next <= pc + 4;
         elsif (mux_control = '1') then
             pc_next <= pc_branch;
         end if;
