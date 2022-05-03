@@ -80,6 +80,8 @@ begin
     reg_block_four_next.rd <= reg_block_three_out.rd;
     reg_block_four_next.write_back_enable <= reg_block_three_out.write_back_enable;
     reg_block_four_next.mux_control_result <= reg_block_three_out.mux_control_result;
+    reg_block_four_next.ALU_result <= reg_block_three_out.result;
+
 
     
     branch_control : process(comp, op_code, funct3) --only compatiable with beq so far
@@ -128,7 +130,7 @@ begin
         end if; 
     end process;
     
-    write_back : process(reg_block_four_out.mux_control_result)
+    write_back : process(reg_block_four_out.mux_control_result, reg_block_four_out.ALU_result, reg_block_four_out.read_data)
     begin 
         if(reg_block_four_out.mux_control_result = '0') then 
             data_write <= reg_block_four_out.ALU_result; --for redundancy
@@ -191,7 +193,7 @@ begin
         read_data => reg_block_four_next.read_data
     );
 
-    registers: process (clk) is
+    registers: process (clk, reg_block_one_next, reg_block_two_next, reg_block_three_next, reg_block_four_next, if_flush) is
     begin
         if rising_edge(clk) then
             if reset_n = '0' then

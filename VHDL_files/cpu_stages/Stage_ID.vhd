@@ -75,7 +75,7 @@ begin
     data_one <= read_data_one;
     data_two <= read_data_two;
     
-    immediate_genarator : process(instruction.opcode,imm_gen_out) --only implemented to check a few opcodes, might need to be extended. 
+    immediate_genarator : process(instruction.opcode,imm_gen_out, instruction.opcode, imm_gen_out, instruction.funct7,instruction.rs2,instruction.rd) --only implemented to check a few opcodes, might need to be extended. 
     begin
         immediate_out <= imm_gen_out;
         if(instruction.opcode = L_FORMAT or instruction.opcode = I_FORMAT) then 
