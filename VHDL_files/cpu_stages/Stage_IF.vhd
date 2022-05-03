@@ -7,7 +7,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity stage_if is
     port(
         clk : in std_logic;
-        rst : in std_logic;
+        n_rst : in std_logic;
         mux_control : in std_logic;
         pc_branch : in std_logic_vector(PROGRAM_ADDRESS_WIDTH-1 downto 0);
         instruction_out : out std_logic_vector(INSTRUCTION_WIDTH-1 downto 0);
@@ -73,7 +73,7 @@ prog_mem: entity work.program_memory
     generic map ( W => PROGRAM_ADDRESS_WIDTH)
     port map(
         clk     => clk,
-        n_rst     => rst,
+        n_rst     => n_rst,
         next_out => pc_next,
         output  => pc
         );

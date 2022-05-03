@@ -142,7 +142,7 @@ begin
     stage_if : entity work.stage_if
     port map(
         clk             => clk,
-        rst             => reset_n,
+        n_rst             => reset_n,
         mux_control     => mux_control_pc,
         pc_branch       => pc_branch,
         instruction_out => reg_block_one_next.instruction,
