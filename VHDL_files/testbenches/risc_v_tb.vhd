@@ -39,7 +39,7 @@ begin
     );        
     
     clk <= not(clk) after period*0.5;
-    rst <= '1' after 2*period;
+    rst <= '1' after 1*period;
 
 
 end structural;
