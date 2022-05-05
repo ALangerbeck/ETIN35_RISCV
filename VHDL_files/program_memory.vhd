@@ -10,14 +10,14 @@ entity program_memory is
         clk: in std_logic;
         write_en: in std_logic;
         write_data: in std_logic_vector(DATA_WIDTH-1 downto 0);
-        address: in std_logic_vector(ADDRESS_WIDTH-1 downto 0);
+        address: in std_logic_vector(PROGRAM_ADDRESS_WIDTH-1 downto 0);
         read_data : out std_logic_vector(DATA_WIDTH-1 downto 0)
     );
 end program_memory;
 
 architecture behavioral of program_memory is
 
-    constant MEMORY_DEPTH: natural := 2 ** ADDRESS_WIDTH;
+    constant MEMORY_DEPTH: natural := 2 ** PROGRAM_ADDRESS_WIDTH;
 
     type ram_type is array (0 to MEMORY_DEPTH-1) of std_logic_vector(DATA_WIDTH-1 downto 0);
     
@@ -39,7 +39,7 @@ architecture behavioral of program_memory is
     
     signal ram: ram_type := initRAM("instruction_mem_added_stalls.mem");
     
-    alias word_address: std_logic_vector(ADDRESS_WIDTH-3 downto 0) is address(ADDRESS_WIDTH-1 downto 2);
+    alias word_address: std_logic_vector(PROGRAM_ADDRESS_WIDTH-3 downto 0) is address(PROGRAM_ADDRESS_WIDTH-1 downto 2);
 
 begin
 

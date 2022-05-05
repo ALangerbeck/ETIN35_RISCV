@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 package common is
 
     constant INSTRUCTION_WIDTH: natural := 32;
-    constant PROGRAM_ADDRESS_WIDTH: natural := 6;
+    constant PROGRAM_ADDRESS_WIDTH: natural := 7;
     constant DATA_ADDRESS_WIDTH: natural := 6;
     constant CPU_DATA_WIDTH: natural := 32;
     constant REGISTER_FILE_ADDRESS_WIDTH: natural := 5;
