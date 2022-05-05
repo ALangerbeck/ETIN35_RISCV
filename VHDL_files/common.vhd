@@ -18,7 +18,17 @@ package common is
     constant L_FORMAT : std_logic_vector(6 downto 0) := "0000011";
     constant S_FORMAT : std_logic_vector(6 downto 0) := "0100011";
     constant B_FORMAT : std_logic_vector(6 downto 0) := "1100011";
-    constant NOP : std_logic_vector(DATA_WIDTH -1 downto 0) := "00000000000000000000000000110011"; --should be an 
+    constant NOP : std_logic_vector(DATA_WIDTH -1 downto 0) := "00000000000000000000000000110011"; --should be an
+
+    -- Debug constants
+    constant Register_type : std_logic_vector := "0110011";
+    constant Integer_Type_Arithmetic : std_logic_vector := "1100111";
+    constant Integer_Type_Load : std_logic_vector := "0000011";
+    constant Store_type : std_logic_vector :=  "0100011";
+    constant Branch_type : std_logic_vector :=  "1100011";
+    constant Upper_type : std_logic_vector := "0110111";
+    
+    type instruction_type_debug is (U_type,J_type,Int_Load,Int_Arith,Store,Branch,Reg,Unknown,None);
     
     --constant OP_ADDI : std_logic_vector(6 downto 0) := "0110011";
 end common;
