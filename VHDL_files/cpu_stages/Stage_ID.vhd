@@ -46,7 +46,8 @@ architecture behavioral of stage_id is
 signal read_data_one, read_data_two : std_logic_vector(DATA_WIDTH-1 downto 0);
 signal instruction : instruction_type;
 signal imm_gen_in : std_logic_vector(11 downto 0);
-signal imm_gen_out, imm_gen_shifted : std_logic_vector(DATA_WIDTH-1 downto 0);
+signal imm_gen_out: std_logic_vector(DATA_WIDTH-1 downto 0);
+signal imm_gen_shifted, pc_temp_calc  : std_logic_vector(12 downto 0);
 
 -- COMPONENT DEFINITION
 
@@ -89,10 +90,11 @@ begin
         end if;
     end process;
     
-    pc_branch : process(imm_gen_out, pc_in,imm_gen_shifted)
+    pc_branch : process(imm_gen_out, pc_in,imm_gen_shifted, pc_temp_calc)
     begin 
-        imm_gen_shifted <= imm_gen_out(DATA_WIDTH -1 downto 1) & '0'; --unsure if this is the correct left shift one that they want us to do. Double check later. 
-        pc_branch_out <= imm_gen_shifted(PROGRAM_ADDRESS_WIDTH-1 downto 0) + pc_in;
+        imm_gen_shifted <= imm_gen_out(11 downto 0) & '0'; --unsure if this is the correct left shift one that they want us to do. Double check later. 
+        pc_temp_calc <= imm_gen_shifted + ("0000000" & pc_in);
+        pc_branch_out <= pc_temp_calc(PROGRAM_ADDRESS_WIDTH-1 downto 0);
     end process;
     
     comparator : process(read_data_one, read_data_two)
