@@ -23,7 +23,8 @@ entity stage_id is
         funct7 : out std_logic_vector(6 downto 0);
         rd : out std_logic_vector(4 downto 0);
         data_one : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        data_two : out std_logic_vector(DATA_WIDTH-1 downto 0)
+        data_two : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        debug_inst_type : out instruction_type_debug
     );
 end stage_id;
 
@@ -48,6 +49,7 @@ signal instruction : instruction_type;
 signal imm_gen_in : std_logic_vector(11 downto 0);
 signal imm_gen_out: std_logic_vector(DATA_WIDTH-1 downto 0);
 signal imm_gen_shifted, pc_temp_calc  : std_logic_vector(12 downto 0);
+signal debug_instruction_type : instruction_type_debug;
 
 -- COMPONENT DEFINITION
 
@@ -75,6 +77,7 @@ begin
     rd <= instruction.rd;
     data_one <= read_data_one;
     data_two <= read_data_two;
+    debug_inst_type <= debug_instruction_type;
     
     immediate_genarator : process(instruction.opcode,imm_gen_out, instruction.opcode, imm_gen_out, instruction.funct7,instruction.rs2,instruction.rd) --only implemented to check a few opcodes, might need to be extended. 
     begin
@@ -104,6 +107,26 @@ begin
         else 
             comp <= '0';
         end if;
+    end process;
+
+    debug_opcode : process (instruction.opcode)
+    begin
+        case instruction.opcode is
+            when Register_type =>
+                debug_instruction_type <= Reg;	
+            when Integer_Type_Arithmetic =>
+                debug_instruction_type <= Int_Arith;
+            when Integer_Type_Load =>
+                debug_instruction_type <= Int_Load;
+            when Store_type =>
+                debug_instruction_type <= Store;
+            when Branch_type =>
+                debug_instruction_type <= Branch;
+            when Upper_type =>
+                debug_instruction_type <= U_type;
+            when others  =>
+                debug_instruction_type <= Unknown;
+         end case;
     end process;
      
     reg_file: entity work.register_file 

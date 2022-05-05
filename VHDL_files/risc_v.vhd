@@ -21,6 +21,7 @@ architecture behavioral of ph_risc_v is
     end record reg_block_one;    
     
     type reg_block_two is record 
+        DEBUG_inst_type : instruction_type_debug;
         mux_control_src2 : std_logic;
         mux_control_result : std_logic;
         write_mem_enable : std_logic;
@@ -30,24 +31,29 @@ architecture behavioral of ph_risc_v is
         immediate : std_logic_vector(DATA_WIDTH-1 downto 0);
         rd :  std_logic_vector(4 downto 0);
         ALU_control : std_logic_vector(2 downto 0);
+        
     end record reg_block_two;
 -- SIGNAL DEFINITIONS
 
-    type reg_block_three is record 
+    type reg_block_three is record
+        DEBUG_inst_type : instruction_type_debug;
         write_mem_enable : std_logic;
         write_back_enable : std_logic;
         mux_control_result : std_logic;
         result : std_logic_vector(DATA_WIDTH-1 downto 0);
         data_two : std_logic_vector(DATA_WIDTH-1 downto 0);
         rd : std_logic_vector(4 downto 0);
+        
     end record reg_block_three;
     
     type reg_block_four is record 
+        DEBUG_inst_type : instruction_type_debug;
         write_back_enable : std_logic;
         mux_control_result : std_logic;
         read_data : std_logic_vector(DATA_WIDTH-1 downto 0);
         ALU_result : std_logic_vector(DATA_WIDTH-1 downto 0);
         rd : std_logic_vector(4 downto 0);
+        
     end record reg_block_four;
 
 signal pc_branch: std_logic_vector(PROGRAM_ADDRESS_WIDTH-1 downto 0);
@@ -76,11 +82,13 @@ begin
     reg_block_three_next.write_mem_enable <= reg_block_two_out.write_mem_enable;
     reg_block_three_next.write_back_enable <= reg_block_two_out.write_back_enable;
     reg_block_three_next.mux_control_result <= reg_block_two_out.mux_control_result;
+    reg_block_three_next.DEBUG_inst_type <= reg_block_two_out.DEBUG_inst_type;
     
     reg_block_four_next.rd <= reg_block_three_out.rd;
     reg_block_four_next.write_back_enable <= reg_block_three_out.write_back_enable;
     reg_block_four_next.mux_control_result <= reg_block_three_out.mux_control_result;
     reg_block_four_next.ALU_result <= reg_block_three_out.result;
+    reg_block_four_next.DEBUG_inst_type <= reg_block_three_out.DEBUG_inst_type;
 
 
     
@@ -170,7 +178,8 @@ begin
         funct7          => funct7,
         rd              => reg_block_two_next.rd, 
         data_one        => reg_block_two_next.data_one, 
-        data_two        => reg_block_two_next.data_two
+        data_two        => reg_block_two_next.data_two,
+        debug_inst_type => reg_block_two_next.DEBUG_inst_type
     );
     
     stage_ex : entity work.stage_ex
@@ -198,9 +207,9 @@ begin
         if rising_edge(clk) then
             if reset_n = '0' then
                 reg_block_one_out <= (others => (others => '0'));
-                reg_block_two_out <= ('0', '0', '0', '0', others => (others => '0'));
-                reg_block_three_out <= ('0', '0', '0', others => (others => '0'));
-                reg_block_four_out <= ('0', '0', others => (others => '0'));
+                reg_block_two_out <= (None,'0', '0', '0', '0', others => (others => '0'));
+                reg_block_three_out <= (None,'0', '0', '0', others => (others => '0'));
+                reg_block_four_out <= (None,'0', '0', others => (others => '0'));
             else
                 if(if_flush = '1') then 
                     reg_block_one_out <= ((others => '0'), NOP);
