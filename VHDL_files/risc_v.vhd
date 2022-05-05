@@ -125,7 +125,7 @@ begin
         if(op_code = R_FORMAT or op_code = L_FORMAT or op_code = I_FORMAT) then
             reg_block_two_next.write_back_enable <= '1';
         end if; 
-        if(op_code = S_FORMAT) then 
+        if(op_code = L_FORMAT) then 
             reg_block_two_next.mux_control_result <= '1';
         end if; 
     end process;

@@ -54,4 +54,5 @@ begin
 
     read_data <= ram(to_integer(unsigned(word_address)));
 
+
 end behavioral;
