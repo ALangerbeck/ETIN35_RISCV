@@ -22,6 +22,8 @@ entity stage_id is
         funct3 : out std_logic_vector(2 downto 0);
         funct7 : out std_logic_vector(6 downto 0);
         rd : out std_logic_vector(4 downto 0);
+        rs1 : out std_logic_vector(4 downto 0);
+        rs2 : out std_logic_vector(4 downto 0);
         data_one : out std_logic_vector(DATA_WIDTH-1 downto 0);
         data_two : out std_logic_vector(DATA_WIDTH-1 downto 0);
         debug_inst_type : out instruction_type_debug
@@ -77,7 +79,12 @@ begin
     rd <= instruction.rd;
     data_one <= read_data_one;
     data_two <= read_data_two;
+<<<<<<< Updated upstream
     debug_inst_type <= debug_instruction_type;
+=======
+    rs1 <= instruction.rs1;
+    rs2 <= instruction.rs2;
+>>>>>>> Stashed changes
     
     immediate_genarator : process(instruction.opcode,imm_gen_out, instruction.opcode, imm_gen_out, instruction.funct7,instruction.rs2,instruction.rd) --only implemented to check a few opcodes, might need to be extended. 
     begin
