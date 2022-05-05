@@ -68,11 +68,33 @@ signal comp : std_logic;
 signal op_code : std_logic_vector(6 downto 0);
 signal funct3 : std_logic_vector(2 downto 0);
 signal funct7 : std_logic_vector(6 downto 0);
+signal rs1 : std_logic_vector(4 downto 0);
+signal rs2 : std_logic_vector(4 downto 0);
+signal mux_ex_two : std_logic_vector(2 downto 0);
+signal mux_id_two : std_logic;
+signal mux_ex_one : std_logic_vector(2 downto 0);
+signal mux_id_one : std_logic;
+signal data_two_from_id : std_logic_vector(DATA_WIDTH-1 downto 0);
+signal data_one_from_id : std_logic_vector(DATA_WIDTH-1 downto 0);
+
 
 signal wb_result : std_logic_vector(DATA_WIDTH-1 downto 0);
 -- COMPONENT DEFINITION
 
-    
+constant FORWARD_NONE: std_logic_vector(1 downto 0) := "00";
+constant FORWARD_EX_MEM: std_logic_vector(1 downto 0) := "01";
+constant FORWARD_MEM_WB: std_logic_vector(1 downto 0) := "10";
+
+component calculate_forwarding is 
+    port (  
+        rs : in std_logic_vector(4 downto 0);
+        rd_ex : in std_logic_vector(4 downto 0);
+        rd_mem : in std_logic_vector(4 downto 0);
+        rd_wb : in std_logic_vector(4 downto 0);
+        ex_mux : out std_logic_vector(2 downto 0);
+        id_mux : out std_logic
+        );
+end component; 
 
 begin
     
@@ -149,6 +171,19 @@ begin
         end if;
     end process;
     
+    forward_wb_to_id : process(mux_id_two, mux_id_one, data_two_from_id, data_one_from_id, wb_result)
+    begin 
+        reg_block_two_next.data_two <= data_two_from_id;
+        reg_block_two_next.data_one <= data_one_from_id;
+        if(mux_id_two = '1') then 
+            reg_block_two_next.data_two <= wb_result;
+        end if; 
+        
+        if(mux_id_one = '1') then 
+            reg_block_two_next.data_one <= wb_result;
+        end if; 
+    end process;
+    
     stage_if : entity work.stage_if
     port map(
         clk             => clk,
@@ -176,9 +211,11 @@ begin
         op_code         => op_code, 
         funct3           => funct3,
         funct7          => funct7,
+        rs1             => rs1, 
+        rs2             => rs2, 
         rd              => reg_block_two_next.rd, 
-        data_one        => reg_block_two_next.data_one, 
-        data_two        => reg_block_two_next.data_two,
+        data_one        => data_one_from_id, 
+        data_two        => data_two_from_id,
         debug_inst_type => reg_block_two_next.DEBUG_inst_type
     );
     
@@ -202,6 +239,26 @@ begin
         read_data => reg_block_four_next.read_data
     );
 
+    calculate_forwarding_1 : calculate_forwarding
+    port map (  
+        rs => rs1,
+        rd_ex => reg_block_two_out.rd,
+        rd_mem  => reg_block_three_out.rd,
+        rd_wb  => reg_block_four_out.rd,
+        ex_mux => mux_ex_one, 
+        id_mux => mux_id_one
+        );
+
+    calculate_forwarding_2 : calculate_forwarding
+    port map (  
+        rs => rs2,
+        rd_ex => reg_block_two_out.rd,
+        rd_mem  => reg_block_three_out.rd,
+        rd_wb  => reg_block_four_out.rd,
+        ex_mux => mux_ex_two, 
+        id_mux => mux_id_two
+        );
+    
     registers: process (clk, reg_block_one_next, reg_block_two_next, reg_block_three_next, reg_block_four_next, if_flush) is
     begin
         if rising_edge(clk) then
