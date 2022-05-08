@@ -22,10 +22,13 @@ architecture behavioral of ph_risc_v is
     
     type reg_block_two is record 
         DEBUG_inst_type : instruction_type_debug;
+        lw : std_logic;
         mux_control_src2 : std_logic;
         mux_control_result : std_logic;
         write_mem_enable : std_logic;
         write_back_enable : std_logic;
+        mux_ex_one : std_logic_vector(1 downto 0);
+        mux_ex_two : std_logic_vector(1 downto 0);
         data_one : std_logic_vector(DATA_WIDTH-1 downto 0);
         data_two : std_logic_vector(DATA_WIDTH-1 downto 0);
         immediate : std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -70,13 +73,16 @@ signal funct3 : std_logic_vector(2 downto 0);
 signal funct7 : std_logic_vector(6 downto 0);
 signal rs1 : std_logic_vector(4 downto 0);
 signal rs2 : std_logic_vector(4 downto 0);
-signal mux_ex_two : std_logic_vector(2 downto 0);
 signal mux_id_two : std_logic;
-signal mux_ex_one : std_logic_vector(2 downto 0);
 signal mux_id_one : std_logic;
 signal data_two_from_id : std_logic_vector(DATA_WIDTH-1 downto 0);
 signal data_one_from_id : std_logic_vector(DATA_WIDTH-1 downto 0);
+signal data_one : std_logic_vector(DATA_WIDTH-1 downto 0);
+signal data_two : std_logic_vector(DATA_WIDTH-1 downto 0);
+signal operand_one : std_logic_vector(DATA_WIDTH-1 downto 0);
+signal operand_two : std_logic_vector(DATA_WIDTH-1 downto 0);
 
+signal stall_1, stall_2, stall : std_logic;
 
 signal wb_result : std_logic_vector(DATA_WIDTH-1 downto 0);
 -- COMPONENT DEFINITION
@@ -91,14 +97,17 @@ component calculate_forwarding is
         rd_ex : in std_logic_vector(4 downto 0);
         rd_mem : in std_logic_vector(4 downto 0);
         rd_wb : in std_logic_vector(4 downto 0);
-        ex_mux : out std_logic_vector(2 downto 0);
-        id_mux : out std_logic
+        lw_ex : in std_logic;
+        opcode : in std_logic_vector(6 downto 0);
+        ex_mux : out std_logic_vector(1 downto 0);
+        id_mux : out std_logic;
+        stall : out std_logic
         );
 end component; 
 
 begin
-    
-    
+    reg_block_two_next.data_one <= data_one;
+    reg_block_two_next.data_two <= data_two;
     reg_block_three_next.rd <= reg_block_two_out.rd;
     reg_block_three_next.data_two <= reg_block_two_out.data_two;
     reg_block_three_next.write_mem_enable <= reg_block_two_out.write_mem_enable;
@@ -112,7 +121,14 @@ begin
     reg_block_four_next.ALU_result <= reg_block_three_out.result;
     reg_block_four_next.DEBUG_inst_type <= reg_block_three_out.DEBUG_inst_type;
 
-
+    comparator : process(data_one, data_two)
+    begin
+        if(data_one = data_two) then 
+            comp <= '1';
+        else 
+            comp <= '0';
+        end if;
+    end process;
     
     branch_control : process(comp, op_code, funct3) --only compatiable with beq so far
     begin 
@@ -173,21 +189,58 @@ begin
     
     forward_wb_to_id : process(mux_id_two, mux_id_one, data_two_from_id, data_one_from_id, wb_result)
     begin 
-        reg_block_two_next.data_two <= data_two_from_id;
-        reg_block_two_next.data_one <= data_one_from_id;
+        data_two <= data_two_from_id;
+        data_one <= data_one_from_id;
         if(mux_id_two = '1') then 
-            reg_block_two_next.data_two <= wb_result;
+            data_two <= wb_result;
         end if; 
         
         if(mux_id_one = '1') then 
-            reg_block_two_next.data_one <= wb_result;
+            data_one <= wb_result;
         end if; 
+    end process;
+    
+    forward_to_ex : process(reg_block_two_out.mux_ex_one, reg_block_two_out.mux_ex_two, reg_block_two_out.data_one, reg_block_two_out.data_two, reg_block_three_out.result, wb_result)
+    begin
+        operand_one <= reg_block_two_out.data_one;
+        operand_two <= reg_block_two_out.data_two;
+        if(reg_block_two_out.mux_ex_one = FORWARD_NONE) then
+            operand_one <= reg_block_two_out.data_one;
+        elsif(reg_block_two_out.mux_ex_one = FORWARD_EX_MEM) then
+            operand_one <= reg_block_three_out.result;
+        elsif(reg_block_two_out.mux_ex_one = FORWARD_MEM_WB) then
+            operand_one <= wb_result;
+        end if;
+        if(reg_block_two_out.mux_ex_two = FORWARD_NONE) then
+            operand_two <= reg_block_two_out.data_two;
+        elsif(reg_block_two_out.mux_ex_two = FORWARD_EX_MEM) then
+            operand_two <= reg_block_three_out.result;
+        elsif(reg_block_two_out.mux_ex_two = FORWARD_MEM_WB) then
+            operand_two <= wb_result;
+        end if;
+    end process;
+    
+    hazard_control_lw : process(op_code)
+    begin 
+        reg_block_two_next.lw <= '0';
+        if(op_code = L_FORMAT) then 
+            reg_block_two_next.lw <= '1';
+        end if; 
+    end process;
+    
+    hazard_control_stall : process(stall_1, stall_2)
+    begin 
+        stall <= '0';
+        if(stall_1 = '1' or stall_2 = '1') then
+            stall <= '1';
+        end if;
     end process;
     
     stage_if : entity work.stage_if
     port map(
         clk             => clk,
-        n_rst             => reset_n,
+        n_rst           => reset_n,
+        stall           => stall,
         mux_control     => mux_control_pc,
         pc_branch       => pc_branch,
         instruction_out => reg_block_one_next.instruction,
@@ -205,7 +258,6 @@ begin
         rd_from_wb      => reg_block_four_out.rd,  --from wb
         write_en_from_wb => reg_block_four_out.write_back_enable,
         result_from_wb  => wb_result, 
-        comp            => comp,
         pc_branch_out   => pc_branch,
         immediate_out   => reg_block_two_next.immediate,
         op_code         => op_code, 
@@ -222,8 +274,8 @@ begin
     stage_ex : entity work.stage_ex
     port map(
         ALU_control => reg_block_two_out.ALU_control, 
-        data_one => reg_block_two_out.data_one,
-        data_two => reg_block_two_out.data_two,
+        data_one => operand_one,
+        data_two => operand_two,
         immediate => reg_block_two_out.immediate,
         mux_control => reg_block_two_out.mux_control_src2,
         result => reg_block_three_next.result,
@@ -245,8 +297,11 @@ begin
         rd_ex => reg_block_two_out.rd,
         rd_mem  => reg_block_three_out.rd,
         rd_wb  => reg_block_four_out.rd,
-        ex_mux => mux_ex_one, 
-        id_mux => mux_id_one
+        opcode => op_code,
+        lw_ex => reg_block_two_out.lw,
+        ex_mux => reg_block_two_next.mux_ex_one, 
+        id_mux => mux_id_one,
+        stall => stall_1
         );
 
     calculate_forwarding_2 : calculate_forwarding
@@ -255,25 +310,32 @@ begin
         rd_ex => reg_block_two_out.rd,
         rd_mem  => reg_block_three_out.rd,
         rd_wb  => reg_block_four_out.rd,
-        ex_mux => mux_ex_two, 
-        id_mux => mux_id_two
+        opcode => op_code,
+        lw_ex => reg_block_two_out.lw,
+        ex_mux => reg_block_two_next.mux_ex_two, 
+        id_mux => mux_id_two,
+        stall => stall_2
         );
     
-    registers: process (clk, reg_block_one_next, reg_block_two_next, reg_block_three_next, reg_block_four_next, if_flush) is
+    registers: process (clk, reg_block_one_next, reg_block_two_next, reg_block_three_next, reg_block_four_next, if_flush, stall) is
     begin
         if rising_edge(clk) then
             if reset_n = '0' then
                 reg_block_one_out <= (others => (others => '0'));
-                reg_block_two_out <= (None,'0', '0', '0', '0', others => (others => '0'));
+                reg_block_two_out <= (None,'0','0', '0', '0', '0', others => (others => '0'));
                 reg_block_three_out <= (None,'0', '0', '0', others => (others => '0'));
                 reg_block_four_out <= (None,'0', '0', others => (others => '0'));
             else
-                if(if_flush = '1') then 
+                if(stall = '1') then 
+                    reg_block_two_out <= (None,'0','0', '0', '0', '0', others => (others => '0')); -- redo this one to a NOP instruction
+                    reg_block_one_out <= reg_block_one_out;
+                elsif(if_flush = '1' or stall = '1') then 
                     reg_block_one_out <= ((others => '0'), NOP);
-                else
+                    reg_block_two_out <= reg_block_two_next;
+                else 
                     reg_block_one_out <= reg_block_one_next;
+                    reg_block_two_out <= reg_block_two_next;
                 end if;
-                reg_block_two_out <= reg_block_two_next;
                 reg_block_three_out <= reg_block_three_next;
                 reg_block_four_out <= reg_block_four_next;
             end if;

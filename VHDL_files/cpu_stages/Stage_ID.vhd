@@ -14,8 +14,7 @@ entity stage_id is
         rd_from_wb : in std_logic_vector(4 downto 0);
         write_en_from_wb : in std_logic;
         result_from_wb : in std_logic_vector(DATA_WIDTH-1 downto 0); 
-        
-        comp : out std_logic;
+      
         pc_branch_out : out std_logic_vector(PROGRAM_ADDRESS_WIDTH-1 downto 0);
         immediate_out : out std_logic_vector(DATA_WIDTH-1 downto 0);
         op_code : out std_logic_vector(6 downto 0);
@@ -102,15 +101,6 @@ begin
         imm_gen_shifted <= imm_gen_out(11 downto 0) & '0'; --unsure if this is the correct left shift one that they want us to do. Double check later. 
         pc_temp_calc <= imm_gen_shifted + ("000000" & pc_in);
         pc_branch_out <= pc_temp_calc(PROGRAM_ADDRESS_WIDTH-1 downto 0);
-    end process;
-    
-    comparator : process(read_data_one, read_data_two)
-    begin
-        if(read_data_one = read_data_two) then 
-            comp <= '1';
-        else 
-            comp <= '0';
-        end if;
     end process;
 
     debug_opcode : process (instruction.opcode)

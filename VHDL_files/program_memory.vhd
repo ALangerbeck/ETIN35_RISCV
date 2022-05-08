@@ -37,7 +37,7 @@ architecture behavioral of program_memory is
         return ram;        
     end function;
     
-    signal ram: ram_type := initRAM("instruction_mem_added_stalls.mem");
+    signal ram: ram_type := initRAM("instruction_mem_no_stalls.mem");
     
     alias word_address: std_logic_vector(PROGRAM_ADDRESS_WIDTH-3 downto 0) is address(PROGRAM_ADDRESS_WIDTH-1 downto 2);
 

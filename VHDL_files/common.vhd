@@ -22,7 +22,7 @@ package common is
 
     -- Debug constants
     constant Register_type : std_logic_vector := "0110011";
-    constant Integer_Type_Arithmetic : std_logic_vector := "1100111";
+    constant Integer_Type_Arithmetic : std_logic_vector := "0010011";
     constant Integer_Type_Load : std_logic_vector := "0000011";
     constant Store_type : std_logic_vector :=  "0100011";
     constant Branch_type : std_logic_vector :=  "1100011";

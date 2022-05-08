@@ -23,3 +23,15 @@ Project repository for the second project in the course IC-Project 1 given at LT
     - [ ] extra: RV32f
 - [x] Import Massoud's Auxiliaries
 - [ ] Extra :Assembler Extension
+
+## Currently implemented instructions
+
+- R-format
+	- add
+- I-format
+	- addi - add immideate
+	- LW - load word
+- B-format
+	- beq - branch if equal
+- S-format
+	- SW - store word

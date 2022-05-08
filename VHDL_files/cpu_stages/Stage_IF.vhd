@@ -8,6 +8,7 @@ entity stage_if is
     port(
         clk : in std_logic;
         n_rst : in std_logic;
+        stall : in std_logic;
         mux_control : in std_logic;
         pc_branch : in std_logic_vector(PROGRAM_ADDRESS_WIDTH-1 downto 0);
         instruction_out : out std_logic_vector(INSTRUCTION_WIDTH-1 downto 0);
@@ -50,9 +51,11 @@ begin
     pc_out <= pc;
     instruction_out <= instruction;
     
-    program_counter : process(mux_control, pc, pc_branch)
+    program_counter : process(mux_control, pc, pc_branch, stall)
     begin
-        if (mux_control = '0') then 
+        if(stall = '1') then
+            pc_next <= pc;
+        elsif (mux_control = '0') then 
             pc_next <= pc + 4;
         elsif (mux_control = '1') then
             pc_next <= pc_branch;
