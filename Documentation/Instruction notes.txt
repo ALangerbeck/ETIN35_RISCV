@@ -1,3 +1,12 @@
 LW - load word instruction. Adds rs1 + immediate for memory address, then sends it to mem stage. It has a rd, for the register to write the
 read value to. 
 SW - store word instruction. Adds rs1 + immediate for memory address, then stores value at rs2 at that address. 
+
+Note over data hazards:
+
+The code only checks data hazards in a rudamentory way right now. It checks for the cases when it has a branch instruction and needs to wait
+because one or both of the register sources is being computed, that one should not create unnecessary stalls. 
+The second type checks whether we have a load instruction in the execution stage and wheteher what we need to load is going to be needed for
+the current instruction. If it is we will stall for one clock cycle. This one could make us stall one unnecessary clock cycle by us checking
+both rs1 and rs2 when we do not need them for our current instruction and therefore stalling when not needed. To remedy that one has to
+check the opcode of the current instruction in more detail and I am not sure that implementation is worth the time to fix. 
