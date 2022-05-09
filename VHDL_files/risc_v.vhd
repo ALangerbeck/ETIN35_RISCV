@@ -149,20 +149,29 @@ begin
         reg_block_two_next.mux_control_src2 <= '1';
         reg_block_two_next.ALU_control <= "0000";
         block_wb <= '0';
-        -- ALU control only supports R_add, I_addi, S_SW and L_LW right now
+        -- add
         if((funct3 = "000" and(op_code = I_FORMAT or (op_code = R_FORMAT and funct7 = "0000000"))) or op_code= S_FORMAT or op_code = L_FORMAT) then 
             reg_block_two_next.ALU_control <= "0010";
-        elsif(funct3 = "010" and op_code = I_FORMAT) then 
+        -- sub
+        elsif(funct3 = "000" and op_code = R_FORMAT and funct7 = "0100000") then
+            reg_block_two_next.ALU_control <= "0110";
+        -- less than 
+        elsif(funct3 = "010" and (op_code = I_FORMAT or op_code = R_FORMAT)) then 
             reg_block_two_next.ALU_control <= "0011";
-        elsif(funct3 = "011" and op_code = I_FORMAT) then 
+        -- unsigned less than
+        elsif(funct3 = "011" and (op_code = I_FORMAT or op_code = R_FORMAT)) then 
             reg_block_two_next.ALU_control <= "0100";
-        elsif(funct3 = "100" and op_code = I_FORMAT) then 
+        -- xor 
+        elsif(funct3 = "100" and (op_code = I_FORMAT or op_code = R_FORMAT)) then 
             reg_block_two_next.ALU_control <= "0101";
-        elsif(funct3 = "110" and op_code = I_FORMAT) then
+        -- or 
+        elsif(funct3 = "110" and (op_code = I_FORMAT or op_code = R_FORMAT)) then
             reg_block_two_next.ALU_control <= "0001";
-        elsif(funct3 = "111" and op_code = I_FORMAT) then
+        -- and 
+        elsif(funct3 = "111" and (op_code = I_FORMAT or op_code = R_FORMAT)) then
             reg_block_two_next.ALU_control <= "0000";  -- technically does not need to be here as and is currently the defalut option, but added for clearity. 
-        elsif(funct3 = "001" and op_code = I_FORMAT) then 
+        -- left logical shift 
+        elsif(funct3 = "001" and( op_code = I_FORMAT or op_code = R_FORMAT)) then 
             --should we have some kind of error message here that changes the instruction to a NOP if it is wrong somehow, so that it would be easier
             -- to debug wrong instructions. 
             if(immediate(4) = '0') then 
@@ -170,16 +179,30 @@ begin
             else
                 block_wb <= '1';
             end if;
-        elsif(funct3 = "101" and op_code = I_FORMAT) then
-            if(immediate(4) = '0') then 
+        -- right logical or arithmetic shift
+        elsif(funct3 = "101") then
+            if(op_code = R_FORMAT) then 
                 if(immediate(10) = '0') then 
-                    reg_block_two_next.ALU_control <= "1000";
+                    -- right logical shift
+                        reg_block_two_next.ALU_control <= "1000";
+                    else
+                    -- right arithmetic shift
+                        reg_block_two_next.ALU_control <= "1001";
+                    end if;
+            end if; 
+            if(op_code = I_FORMAT) then
+                if(immediate(4) = '0') then 
+                    if(immediate(10) = '0') then 
+                    -- right logical shift
+                        reg_block_two_next.ALU_control <= "1000";
+                    else
+                    -- right arithmetic shift
+                        reg_block_two_next.ALU_control <= "1001";
+                    end if;
                 else
-                    reg_block_two_next.ALU_control <= "1001";
+                    block_wb <= '1';
                 end if;
-            else
-                block_wb <= '1';
-            end if;
+            end if;            
         end if;
         
         if(op_code = R_FORMAT) then 

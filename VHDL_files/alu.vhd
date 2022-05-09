@@ -25,35 +25,35 @@ begin
     begin
         debug <= (others => '0');
         case control is
-            when "0000" => 
+            when "0000" => -- and
                 alu_result <= left_operand and right_operand;
-            when "0001" => 
+            when "0001" => --or 
                 alu_result <= left_operand or right_operand;
-            when "0010" =>
+            when "0010" => --add
                 alu_result <= std_logic_vector(signed(left_operand) + signed(right_operand));
-            when "0011" =>
+            when "0011" => -- less than
                 if (signed(left_operand) < signed(right_operand)) then 
                     alu_result <= "0000000000000000000000000000000" & '1';
                 else
                     alu_result <= (others=> '0');
                 end if;
-            when "0100" =>
+            when "0100" => -- unsigned less than
                 debug <= unsigned(left_operand);
                 if (unsigned(left_operand) < unsigned(right_operand)) then 
                     alu_result <= "0000000000000000000000000000000" & '1';
                 else
                     alu_result <= (others=> '0');
                 end if;
-            when "0101" => 
+            when "0101" =>  --xor
                 alu_result <= left_operand xor right_operand; 
-            when "0110" => 
+            when "0110" =>  -- sub
                 alu_result <= std_logic_vector(signed(left_operand) - signed(right_operand));
-            when "0111" =>
-                alu_result <= std_logic_vector(shift_left(unsigned(left_operand),to_integer(unsigned(right_operand(3 downto 0)))));
-            when "1000" =>
-                alu_result <= std_logic_vector(shift_right(unsigned(left_operand),to_integer(unsigned(right_operand(3 downto 0)))));
-            when "1001" =>
-                alu_result <= std_logic_vector(shift_right(signed(left_operand),to_integer(unsigned(right_operand(3 downto 0)))));
+            when "0111" => -- left logical shift
+                alu_result <= std_logic_vector(shift_left(unsigned(left_operand),to_integer(unsigned(right_operand(4 downto 0)))));
+            when "1000" => -- right logical shift
+                alu_result <= std_logic_vector(shift_right(unsigned(left_operand),to_integer(unsigned(right_operand(4 downto 0)))));
+            when "1001" => -- right arithmetical shift. 
+                alu_result <= std_logic_vector(shift_right(signed(left_operand),to_integer(unsigned(right_operand(4 downto 0)))));
             when others => 
                 alu_result <= left_operand and right_operand;
         end case;
