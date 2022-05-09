@@ -32,6 +32,8 @@ Project repository for the second project in the course IC-Project 1 given at LT
 	- addi - add immideate
 	- slti - set if less than immediate
 	- sltiu - set if less than immediate unsigned - some questions about this one
+	- xori - bitwise logical xor operator
+	- ori - bitwise logical or operator
 	- LW - load word
 - B-format
 	- beq - branch if equal

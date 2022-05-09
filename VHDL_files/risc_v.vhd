@@ -5,7 +5,6 @@ use work.common.all;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity ph_risc_v is    
-    
     port(
         clk: in std_logic;
         reset_n: in std_logic;
@@ -153,6 +152,10 @@ begin
             reg_block_two_next.ALU_control <= "0011";
         elsif(funct3 = "011" and op_code = I_FORMAT) then 
             reg_block_two_next.ALU_control <= "0100";
+        elsif(funct3 = "100" and op_code = I_FORMAT) then 
+            reg_block_two_next.ALU_control <= "0101";
+        elsif(funct3 = "110" and op_code = I_FORMAT) then
+            reg_block_two_next.ALU_control <= "0001";
         end if;
         
         if(op_code = R_FORMAT) then 

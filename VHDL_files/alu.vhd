@@ -44,6 +44,8 @@ begin
                 else
                     alu_result <= (others=> '0');
                 end if;
+            when "0101" => 
+                alu_result <= left_operand xor right_operand; 
             when "0110" => 
                 alu_result <= std_logic_vector(signed(left_operand) - signed(right_operand));
             when others => 
