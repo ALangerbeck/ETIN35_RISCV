@@ -34,6 +34,10 @@ Project repository for the second project in the course IC-Project 1 given at LT
 	- sltiu - set if less than immediate unsigned - some questions about this one
 	- xori - bitwise logical xor operator
 	- ori - bitwise logical or operator
+	- andi - bitwise logical and operator
+	- slli - shift left logical immediate
+	- srli - shift right logical immediate
+	- srai - shift right arithmetic immediate
 	- LW - load word
 - B-format
 	- beq - branch if equal
