@@ -5,7 +5,7 @@ use work.common.all;
 
 entity stage_ex is
     port(
-        ALU_control : in std_logic_vector(2 downto 0);
+        ALU_control : in std_logic_vector(3 downto 0);
         data_one : in std_logic_vector(DATA_WIDTH-1 downto 0);
         data_two : in std_logic_vector(DATA_WIDTH-1 downto 0);
         immediate : in std_logic_vector(DATA_WIDTH-1 downto 0);

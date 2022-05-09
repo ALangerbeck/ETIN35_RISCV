@@ -33,7 +33,7 @@ architecture behavioral of ph_risc_v is
         data_two : std_logic_vector(DATA_WIDTH-1 downto 0);
         immediate : std_logic_vector(DATA_WIDTH-1 downto 0);
         rd :  std_logic_vector(4 downto 0);
-        ALU_control : std_logic_vector(2 downto 0);
+        ALU_control : std_logic_vector(3 downto 0);
         
     end record reg_block_two;
 -- SIGNAL DEFINITIONS
@@ -145,14 +145,14 @@ begin
     ALU_control : process(op_code, funct3, funct7)
     begin 
         reg_block_two_next.mux_control_src2 <= '1';
-        reg_block_two_next.ALU_control <= "000";
+        reg_block_two_next.ALU_control <= "0000";
         -- ALU control only supports R_add, I_addi, S_SW and L_LW right now
         if((funct3 = "000" and(op_code = I_FORMAT or (op_code = R_FORMAT and funct7 = "0000000"))) or op_code= S_FORMAT or op_code = L_FORMAT) then 
-            reg_block_two_next.ALU_control <= "010";
+            reg_block_two_next.ALU_control <= "0010";
         elsif(funct3 = "010" and op_code = I_FORMAT) then 
-            reg_block_two_next.ALU_control <= "011";
+            reg_block_two_next.ALU_control <= "0011";
         elsif(funct3 = "011" and op_code = I_FORMAT) then 
-            reg_block_two_next.ALU_control <= "100";
+            reg_block_two_next.ALU_control <= "0100";
         end if;
         
         if(op_code = R_FORMAT) then 

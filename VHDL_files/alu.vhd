@@ -6,7 +6,7 @@ use work.common.all;
 
 entity alu is
     port(
-        control: in std_logic_vector(2 downto 0);
+        control: in std_logic_vector(3 downto 0);
         left_operand: in std_logic_vector(DATA_WIDTH-1 downto 0);
         right_operand: in std_logic_vector(DATA_WIDTH-1 downto 0);
         zero: out std_logic;
@@ -25,26 +25,26 @@ begin
     begin
         debug <= (others => '0');
         case control is
-            when "000" => 
+            when "0000" => 
                 alu_result <= left_operand and right_operand;
-            when "001" => 
+            when "0001" => 
                 alu_result <= left_operand or right_operand;
-            when "010" =>
+            when "0010" =>
                 alu_result <= std_logic_vector(signed(left_operand) + signed(right_operand));
-            when "011" =>
+            when "0011" =>
                 if (signed(left_operand) < signed(right_operand)) then 
                     alu_result <= "0000000000000000000000000000000" & '1';
                 else
                     alu_result <= (others=> '0');
                 end if;
-            when "100" =>
+            when "0100" =>
                 debug <= unsigned(left_operand);
                 if (unsigned(left_operand) < unsigned(right_operand)) then 
                     alu_result <= "0000000000000000000000000000000" & '1';
                 else
                     alu_result <= (others=> '0');
                 end if;
-            when "110" => 
+            when "0110" => 
                 alu_result <= std_logic_vector(signed(left_operand) - signed(right_operand));
             when others => 
                 alu_result <= left_operand and right_operand;
