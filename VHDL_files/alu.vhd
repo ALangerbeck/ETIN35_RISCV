@@ -48,6 +48,12 @@ begin
                 alu_result <= left_operand xor right_operand; 
             when "0110" => 
                 alu_result <= std_logic_vector(signed(left_operand) - signed(right_operand));
+            when "0111" =>
+                alu_result <= std_logic_vector(shift_left(unsigned(left_operand),to_integer(unsigned(right_operand(3 downto 0)))));
+            when "1000" =>
+                alu_result <= std_logic_vector(shift_right(unsigned(left_operand),to_integer(unsigned(right_operand(3 downto 0)))));
+            when "1001" =>
+                alu_result <= std_logic_vector(shift_right(signed(left_operand),to_integer(unsigned(right_operand(3 downto 0)))));
             when others => 
                 alu_result <= left_operand and right_operand;
         end case;

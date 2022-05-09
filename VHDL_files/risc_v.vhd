@@ -82,8 +82,10 @@ signal operand_one : std_logic_vector(DATA_WIDTH-1 downto 0);
 signal operand_two : std_logic_vector(DATA_WIDTH-1 downto 0);
 
 signal stall_1, stall_2, stall : std_logic;
+signal immediate : std_logic_vector(DATA_WIDTH-1 downto 0);
 
 signal wb_result : std_logic_vector(DATA_WIDTH-1 downto 0);
+signal block_wb : std_logic;
 -- COMPONENT DEFINITION
 
 constant FORWARD_NONE: std_logic_vector(1 downto 0) := "00";
@@ -107,6 +109,7 @@ end component;
 begin
     reg_block_two_next.data_one <= data_one;
     reg_block_two_next.data_two <= data_two;
+    reg_block_two_next.immediate <= immediate;
     reg_block_three_next.rd <= reg_block_two_out.rd;
     reg_block_three_next.data_two <= reg_block_two_out.data_two;
     reg_block_three_next.write_mem_enable <= reg_block_two_out.write_mem_enable;
@@ -141,10 +144,11 @@ begin
         end if;
     end process;
     
-    ALU_control : process(op_code, funct3, funct7)
+    ALU_control : process(op_code, funct3, funct7, immediate)
     begin 
         reg_block_two_next.mux_control_src2 <= '1';
         reg_block_two_next.ALU_control <= "0000";
+        block_wb <= '0';
         -- ALU control only supports R_add, I_addi, S_SW and L_LW right now
         if((funct3 = "000" and(op_code = I_FORMAT or (op_code = R_FORMAT and funct7 = "0000000"))) or op_code= S_FORMAT or op_code = L_FORMAT) then 
             reg_block_two_next.ALU_control <= "0010";
@@ -156,6 +160,26 @@ begin
             reg_block_two_next.ALU_control <= "0101";
         elsif(funct3 = "110" and op_code = I_FORMAT) then
             reg_block_two_next.ALU_control <= "0001";
+        elsif(funct3 = "111" and op_code = I_FORMAT) then
+            reg_block_two_next.ALU_control <= "0000";  -- technically does not need to be here as and is currently the defalut option, but added for clearity. 
+        elsif(funct3 = "001" and op_code = I_FORMAT) then 
+            --should we have some kind of error message here that changes the instruction to a NOP if it is wrong somehow, so that it would be easier
+            -- to debug wrong instructions. 
+            if(immediate(4) = '0') then 
+                reg_block_two_next.ALU_control <= "0111";
+            else
+                block_wb <= '1';
+            end if;
+        elsif(funct3 = "101" and op_code = I_FORMAT) then
+            if(immediate(4) = '0') then 
+                if(immediate(10) = '0') then 
+                    reg_block_two_next.ALU_control <= "1000";
+                else
+                    reg_block_two_next.ALU_control <= "1001";
+                end if;
+            else
+                block_wb <= '1';
+            end if;
         end if;
         
         if(op_code = R_FORMAT) then 
@@ -171,11 +195,11 @@ begin
     end if;
     end process;
     
-    write_back_control : process(op_code)
+    write_back_control : process(op_code, block_wb)
     begin 
         reg_block_two_next.write_back_enable <= '0';
         reg_block_two_next.mux_control_result <= '0'; --- means ALU_result
-        if(op_code = R_FORMAT or op_code = L_FORMAT or op_code = I_FORMAT) then
+        if((op_code = R_FORMAT or op_code = L_FORMAT or op_code = I_FORMAT) and block_wb = '0') then
             reg_block_two_next.write_back_enable <= '1';
         end if; 
         if(op_code = L_FORMAT) then 
@@ -266,7 +290,7 @@ begin
         write_en_from_wb => reg_block_four_out.write_back_enable,
         result_from_wb  => wb_result, 
         pc_branch_out   => pc_branch,
-        immediate_out   => reg_block_two_next.immediate,
+        immediate_out   => immediate,
         op_code         => op_code, 
         funct3           => funct3,
         funct7          => funct7,
