@@ -18,7 +18,9 @@ end program_memory;
 architecture behavioral of program_memory is
 
     constant MEMORY_DEPTH: natural := 2 ** PROGRAM_ADDRESS_WIDTH;
-
+    
+    
+    
     type ram_type is array (0 to MEMORY_DEPTH-1) of std_logic_vector(DATA_WIDTH-1 downto 0);
     
     impure function initRAM(filename: in string) return ram_type is
@@ -37,7 +39,7 @@ architecture behavioral of program_memory is
         return ram;        
     end function;
     
-    signal ram: ram_type := initRAM("instruction_mem_no_stalls.mem");
+    signal ram: ram_type := initRAM("instruction_mem_test_sltiu.mem");
     
     alias word_address: std_logic_vector(PROGRAM_ADDRESS_WIDTH-3 downto 0) is address(PROGRAM_ADDRESS_WIDTH-1 downto 2);
 

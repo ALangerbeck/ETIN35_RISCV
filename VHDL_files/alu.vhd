@@ -17,11 +17,13 @@ end alu;
 architecture behavioral of alu is
 
     signal alu_result: std_logic_vector(DATA_WIDTH-1 downto 0);
-
+    signal debug : unsigned(DATA_WIDTH-1 downto 0);
 begin
 
+    -- the originl from Masudos code was 000, 001, 010, 110, and the others have been added by us. 
     process(control, left_operand, right_operand)
     begin
+        debug <= (others => '0');
         case control is
             when "000" => 
                 alu_result <= left_operand and right_operand;
@@ -29,6 +31,19 @@ begin
                 alu_result <= left_operand or right_operand;
             when "010" =>
                 alu_result <= std_logic_vector(signed(left_operand) + signed(right_operand));
+            when "011" =>
+                if (signed(left_operand) < signed(right_operand)) then 
+                    alu_result <= "0000000000000000000000000000000" & '1';
+                else
+                    alu_result <= (others=> '0');
+                end if;
+            when "100" =>
+                debug <= unsigned(left_operand);
+                if (unsigned(left_operand) < unsigned(right_operand)) then 
+                    alu_result <= "0000000000000000000000000000000" & '1';
+                else
+                    alu_result <= (others=> '0');
+                end if;
             when "110" => 
                 alu_result <= std_logic_vector(signed(left_operand) - signed(right_operand));
             when others => 

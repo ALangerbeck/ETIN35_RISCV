@@ -10,3 +10,8 @@ The second type checks whether we have a load instruction in the execution stage
 the current instruction. If it is we will stall for one clock cycle. This one could make us stall one unnecessary clock cycle by us checking
 both rs1 and rs2 when we do not need them for our current instruction and therefore stalling when not needed. To remedy that one has to
 check the opcode of the current instruction in more detail and I am not sure that implementation is worth the time to fix. 
+
+Questions: 
+
+For unsigned operations. If the signed number is -7, should the unsigned number be 7 or the value the unsigned number of the two complements
+value of -7. After readig it seems like the second option is the one that should be implemented, but it might be best to ask

@@ -149,6 +149,10 @@ begin
         -- ALU control only supports R_add, I_addi, S_SW and L_LW right now
         if((funct3 = "000" and(op_code = I_FORMAT or (op_code = R_FORMAT and funct7 = "0000000"))) or op_code= S_FORMAT or op_code = L_FORMAT) then 
             reg_block_two_next.ALU_control <= "010";
+        elsif(funct3 = "010" and op_code = I_FORMAT) then 
+            reg_block_two_next.ALU_control <= "011";
+        elsif(funct3 = "011" and op_code = I_FORMAT) then 
+            reg_block_two_next.ALU_control <= "100";
         end if;
         
         if(op_code = R_FORMAT) then 
