@@ -14,4 +14,7 @@ check the opcode of the current instruction in more detail and I am not sure tha
 Questions: 
 
 For unsigned operations. If the signed number is -7, should the unsigned number be 7 or the value the unsigned number of the two complements
-value of -7. After readig it seems like the second option is the one that should be implemented, but it might be best to ask
+value of -7. After readig it seems like the second option is the one that should be implemented, but it might be best to ask. 
+
+For the shift addi instructions is the shamt(5) meant to be the fifth bit or the sixth bit, is unclear as usually it is written as bit 11-0
+when you have 12 bits, but sometimes, it is written 12-1. 
