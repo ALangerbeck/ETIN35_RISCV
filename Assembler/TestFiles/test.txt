@@ -1,3 +1,3 @@
-addi 1 2 asda ;what is this
-label:
-addi 2
+label1: addi 1 2 3 ;what is this
+addi 2 3 1
+jal 1 label
