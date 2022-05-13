@@ -67,21 +67,37 @@ for i in range(len(lines)):                         # PASS 1: do PER LINE replac
                 lines[i][j] = str(val & 0xff)
                 lines[i].insert(j+1, str((val>>8) & 0xff))
 
+########################### catering to specific intructions ###########################################
 for i in range(len(lines)):
     opcode = lines[i][0]
     ### integer instruction ###
-    if opcode == '0010011':
-        if(len(lines) == 4 ):
-            print("Expecting 3 arguments")
-            break
+    if opcode == '0010011' or opcode == '0000011':
+        if(len(lines) != 4 ):
+            raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
         lines[i][1] = "{:05b}".format(int(lines[i][1]))
         funct = constants.memonicToFunct[lineinfo[i]]
         lines[i].insert(2,funct)
         lines[i][3] = "{:05b}".format(int(lines[i][3]))
         lines[i][4] = "{:012b}".format(int(lines[i][4]))
-    
+    ### Register instructions ##
+    elif opcode == '0110011':
+        if(len(lines) != 4 ):
+            raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
+        lines[i][1] = "{:05b}".format(int(lines[i][1]))
+        funct = constants.memonicToFunct[lineinfo[i]]
+        lines[i].insert(2,funct)
+        lines[i][2] = "{:05b}".format(int(lines[i][3]))
+        lines[i][3] = "{:05b}".format(int(lines[i][3]))
+        lines[i][4] = constants.memonicToImm[lineinfo[i]]
+    ### store instructions
+    elif opcode == '0100011':
+        
+    ### concatenating the instruction into one sting ###
     lines[i].reverse()
-    for
+    concat_string = ""
+    for inst in lines[i]:
+       concat_string =  concat_string + inst
+    lines[i] = concat_string
         
 
 
