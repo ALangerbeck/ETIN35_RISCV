@@ -66,7 +66,9 @@ signal reg_block_three_next, reg_block_three_out : reg_block_three;
 signal reg_block_four_next, reg_block_four_out : reg_block_four;
 
 signal if_flush : std_logic;
+signal comp_equal : std_logic;
 signal comp : std_logic;
+signal comp_u : std_logic;
 signal op_code : std_logic_vector(6 downto 0);
 signal funct3 : std_logic_vector(2 downto 0);
 signal funct7 : std_logic_vector(6 downto 0);
@@ -123,21 +125,32 @@ begin
     reg_block_four_next.ALU_result <= reg_block_three_out.result;
     reg_block_four_next.DEBUG_inst_type <= reg_block_three_out.DEBUG_inst_type;
 
+    -- maybe this should be structured more like an alu with alternating operating modes depending on control signals. 
     comparator : process(data_one, data_two)
     begin
         if(data_one = data_two) then 
-            comp <= '1';
+            comp_equal <= '1';
         else 
-            comp <= '0';
+            comp_equal <= '0';
         end if;
+        if(signed(data_one) < signed(data_two)) then 
+            comp <= '1';
+        else
+            comp <= '0';
+        end if; 
+        if(unsigned(data_one) < unsigned(data_two)) then 
+            comp_u <= '1';
+        else
+            comp_u <= '0';
+        end if; 
     end process;
     
-    branch_control : process(comp, op_code, funct3) --only compatiable with beq so far
+    branch_control : process(comp_equal, comp, op_code, funct3) --only compatiable with beq so far
     begin 
         mux_control_pc <= '0';
         if_flush <= '0';
         if(op_code = B_FORMAT) then 
-            if(funct3 = "000" and comp ='1') then 
+            if((funct3 = "000" and comp_equal ='1') or( funct3 ="001" and comp_equal = '0')or( funct3 ="100" and comp = '1') or( funct3 ="101" and comp_equal = '1')or( funct3 ="110" and (comp_equal = '1' or comp_u = '1'))or( funct3 ="111" and (comp_equal = '0' and comp_u = '0'))) then 
                 mux_control_pc <= '1';
                 if_flush <= '1';
             end if;
@@ -182,7 +195,7 @@ begin
         -- right logical or arithmetic shift
         elsif(funct3 = "101") then
             if(op_code = R_FORMAT) then 
-                if(immediate(10) = '0') then 
+                if(immediate(10) = '0') then --maybe this should change to looking at funct7. 
                     -- right logical shift
                         reg_block_two_next.ALU_control <= "1000";
                     else
