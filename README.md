@@ -26,8 +26,17 @@ Project repository for the second project in the course IC-Project 1 given at LT
 
 ## Currently implemented instructions
 
-- R-format
-	- add
+- R-format - performs register to register operations
+	- add - rtr addition
+	- sub - rtr subtraction
+	- sll - shift left logical, shift rs1 left by rs2 bit positions, only looks at the five lsb of rs2.
+	- slt - set if less than, compares rs1 to rs2 and sets rd as 1 if rs1 is smaller. 
+	- sltu - set if less than unsigned
+	- xor - bitwise logical xor operator
+	- srl - shift right logical
+	- sra - shift right arithmetical
+	- or - bitwise logical or operator
+	- and - bitwise logical and operation
 - I-format
 	- addi - add immideate
 	- slti - set if less than immediate
@@ -41,5 +50,10 @@ Project repository for the second project in the course IC-Project 1 given at LT
 	- LW - load word
 - B-format
 	- beq - branch if equal
+	- bne
+	- blt
+	- bge
+	- bltu
+	- bgeu
 - S-format
 	- SW - store word

@@ -85,7 +85,7 @@ begin
     immediate_genarator : process(instruction.opcode,imm_gen_out, instruction.opcode, imm_gen_out, instruction.funct7,instruction.rs2,instruction.rd) --only implemented to check a few opcodes, might need to be extended. 
     begin
         immediate_out <= imm_gen_out;
-        if(instruction.opcode = L_FORMAT or instruction.opcode = I_FORMAT) then 
+        if(instruction.opcode = L_FORMAT or instruction.opcode = I_FORMAT or instruction.opcode = R_FORMAT) then 
             imm_gen_in <=  instruction.funct7 & instruction.rs2;
         elsif(instruction.opcode = S_FORMAT) then 
             imm_gen_in <= instruction.funct7 & instruction.rd;
