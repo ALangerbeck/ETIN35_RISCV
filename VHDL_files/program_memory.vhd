@@ -21,12 +21,12 @@ architecture behavioral of program_memory is
     
     
     
-    type ram_type is array (0 to MEMORY_DEPTH-1) of std_logic_vector(DATA_WIDTH-1 downto 0);
+    type ram_type is array (0 to 4*MEMORY_DEPTH-1) of std_logic_vector(DATA_WIDTH/4-1 downto 0);
     
     impure function initRAM(filename: in string) return ram_type is
         FILE ram_file: text is in filename;
         variable ram_file_line: line;
-        variable instruction: bit_vector(DATA_WIDTH-1 downto 0);
+        variable instruction: bit_vector(DATA_WIDTH/4-1 downto 0);
         variable ram: ram_type := (others => (others => '0'));
     begin
         for i in ram_type'range loop
@@ -39,9 +39,9 @@ architecture behavioral of program_memory is
         return ram;        
     end function;
     
-    signal ram: ram_type := initRAM("instruction_mem_test_and.mem");
+    signal ram: ram_type := initRAM("instruction_mem_byte_addressable.mem");
     
-    alias word_address: std_logic_vector(PROGRAM_ADDRESS_WIDTH-3 downto 0) is address(PROGRAM_ADDRESS_WIDTH-1 downto 2);
+    alias word_address: std_logic_vector(PROGRAM_ADDRESS_WIDTH-1 downto 0) is address(PROGRAM_ADDRESS_WIDTH-1 downto 0);
 
 begin
 
@@ -49,12 +49,15 @@ begin
     begin
         if rising_edge(clk) then
             if write_en = '1' then
-                ram(to_integer(unsigned(word_address))) <= write_data;
+                ram(to_integer(unsigned(word_address))) <= write_data(7 downto 0);
+                ram(to_integer(unsigned(word_address)+1)) <= write_data(15 downto 8);
+                ram(to_integer(unsigned(word_address)+2)) <= write_data(23 downto 16);
+                ram(to_integer(unsigned(word_address)+3)) <= write_data(31 downto 24);
             end if;
         end if;
     end process instruction_ram;
 
-    read_data <= ram(to_integer(unsigned(word_address)));
+    read_data <= ram(to_integer(unsigned(word_address)+3)) & ram(to_integer(unsigned(word_address)+2)) & ram(to_integer(unsigned(word_address)+1)) & ram(to_integer(unsigned(word_address)));
 
 
 end behavioral;
