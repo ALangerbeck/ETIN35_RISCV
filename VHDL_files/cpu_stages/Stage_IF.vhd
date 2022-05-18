@@ -56,7 +56,7 @@ begin
         if(stall = '1') then
             pc_next <= pc;
         elsif (mux_control = '0') then
-            if(instruction(0) = '0') then
+            if(instruction(0) = '0' or instruction(1)='0') then
                 pc_next <= pc + 2;
             else
                 pc_next <= pc + 4;

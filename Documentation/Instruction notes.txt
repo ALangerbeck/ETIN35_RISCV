@@ -18,3 +18,6 @@ value of -7. After readig it seems like the second option is the one that should
 
 For the shift addi instructions is the shamt(5) meant to be the fifth bit or the sixth bit, is unclear as usually it is written as bit 11-0
 when you have 12 bits, but sometimes, it is written 12-1. 
+
+For compressed instructions - does the uimm mean we have an unsigned immediate that we therefore should zero extend? That is the way I have
+implemented it so far at least. 

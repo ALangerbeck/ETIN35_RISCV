@@ -50,10 +50,31 @@ Project repository for the second project in the course IC-Project 1 given at LT
 	- LW - load word
 - B-format
 	- beq - branch if equal
-	- bne
-	- blt
-	- bge
-	- bltu
-	- bgeu
+	- bne - branch if not equal 
+	- blt - branch if less than - if rg1 is less than rg2 
+	- bge - branch if greater than or equal 
+	- bltu - branch if less than or equal unsigned
+	- bgeu - branch if greater than unsigned
 - S-format
 	- SW - store word
+- Compressed instructions 
+	- c.LW - expands rd, uimm(rs1') where rd = 8+rd' and rs1=8+rs1'
+		     and uimm is basically shifted two to the left before 
+			 being turned into imm. 
+	- c.SW - expands sw rs2, uimm(rs1) where rs2 = 8+rs2' and rs1 = 8+rs1'
+	- c.ADD - expand to add rd,rd,rs2 
+	- c.ADDI - expand to addi rd, rd, imm with a sign extended 6 bit immediate
+	- c.SUB - expand sub rd. rd, rs2 where rd=8+rd' and rs2=8+rs2'
+	- c.AND - expands to and rd, rd, rs2 where rd=8+rd' and rs2=8+rs2'
+	- c.ANDI - expands to andi rd, rd, imm where rd=8+rd'
+	- c.OR - expands to or rd, rd, rs2, rd=8+rd' rs2=8+rs2'
+	- c.XOR - expands to xor, rd, rd, rs2 where rd=8+rd' and rs2=rs2=8+rs2'
+	- c.MV - expands to add rd, x0, rs2 Invalid when rs2=0
+	- c.LI - expands to addi rd, x0, imm
+	- c.LUI - do later after ordinary lui
+	- c.SLLI - shift left logical immediate expands to slli rd, rd, uimm
+	- c.SRAI - shift right arithmetuc immediate. expands to srai rd, rd, uimm 
+	           where rd=8+rd'
+	- c.SRLI - shift right logical immediate, expands to srli rd, rd, uimm 
+	           where rd=8+rd'
+	- c.nop - used for unkown instruction.

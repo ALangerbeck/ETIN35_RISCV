@@ -46,11 +46,21 @@ architecture behavioral of stage_id is
 
 --Double check that the read of the register file happens asynchronously
 signal read_data_one, read_data_two : std_logic_vector(DATA_WIDTH-1 downto 0);
-signal instruction : instruction_type;
+signal instruction, instruction_ordi, instruction_comp : instruction_type;
 signal imm_gen_in : std_logic_vector(11 downto 0);
 signal imm_gen_out: std_logic_vector(DATA_WIDTH-1 downto 0);
+signal imm_gen_in_c : std_logic_vector(5 downto 0);
+signal imm_gen_out_c : std_logic_vector(11 downto 0);
 signal imm_gen_shifted, pc_temp_calc  : std_logic_vector(12 downto 0);
 signal debug_instruction_type : instruction_type_debug;
+
+signal opcode_c : std_logic_vector(6 downto 0);
+signal rd_c : std_logic_vector(4 downto 0);
+signal funct3_c : std_logic_vector(2 downto 0);
+signal rs1_c : std_logic_vector(4 downto 0);
+signal rs2_c : std_logic_vector(4 downto 0);
+signal funct7_C : std_logic_vector(6 downto 0);
+
 
 -- COMPONENT DEFINITION
 
@@ -65,12 +75,19 @@ end component;
 
 begin
 
-    instruction <= (  opcode  => instruction_in(6 downto 0),
-                      rd => instruction_in(11 downto 7),
-                      funct3 => instruction_in(14 downto 12),
-                      rs1 => instruction_in(19 downto 15),
-                      rs2 => instruction_in(24 downto 20),
-                      funct7=> instruction_in(31 downto 25));
+    instruction_ordi <= (  opcode  => instruction_in(6 downto 0),
+                  rd => instruction_in(11 downto 7),
+                  funct3 => instruction_in(14 downto 12),
+                  rs1 => instruction_in(19 downto 15),
+                  rs2 => instruction_in(24 downto 20),
+                  funct7=> instruction_in(31 downto 25));
+                      
+    instruction_comp <= (  opcode  => opcode_c,
+                  rd => rd_c,
+                  funct3 => funct3_c,
+                  rs1 => rs1_c,
+                  rs2 => rs2_c,
+                  funct7=> funct7_c);             
                       
     op_code <= instruction.opcode;
     funct3 <= instruction.funct3;
@@ -81,6 +98,154 @@ begin
     debug_inst_type <= debug_instruction_type;
     rs1 <= instruction.rs1;
     rs2 <= instruction.rs2;
+    
+    pick_format : process(instruction_ordi, instruction_comp) 
+    begin 
+         if(instruction_in(0) = '0' or instruction_in(1) = '0') then 
+            instruction <= instruction_comp;
+         else
+            instruction <= instruction_ordi;
+         end if;
+    
+    end process;
+    
+    sign_extend_compressed : process(instruction_in)
+    begin
+        imm_gen_in_c <= "000000";
+        --c.addi
+        if(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "000") then 
+            imm_gen_in_c <= instruction_in(12) & instruction_in(6 downto 2);
+        --c.andi
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "100" and instruction_in(11 downto 10)="10") then 
+            imm_gen_in_c <= instruction_in(12) & instruction_in(6 downto 2);
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "010") then 
+            imm_gen_in_c <= instruction_in(12) & instruction_in(6 downto 2);
+        end if;
+    end process;
+    
+    compressed_decode : process(instruction_in, imm_gen_out_c)
+    begin 
+        -- verkar som funct3_c <= instruction_in(15 downto 13); -- not for sw
+        if(instruction_in(1 downto 0) = "00" and instruction_in(15 downto 13) =  "010") then --c.lw
+            opcode_c <= "0000011";
+            rd_c <= instruction_in(4 downto 2) +8;
+            funct3_c <= "010";
+            rs1_c <= instruction_in(9 downto 7) +8;
+            rs2_c <= instruction_in(11 downto 10) & instruction_in(6) & "00";
+            funct7_c <= "00000" & instruction_in(12) & instruction_in(5);
+        -- c.sw
+        elsif(instruction_in(1 downto 0) = "00" and instruction_in(15 downto 13) = "110") then 
+            opcode_c <= "0100011";
+            rd_c <= instruction_in(11 downto 10) & instruction_in(6) & "00";
+            funct3_c <= "010";
+            rs1_c <= instruction_in(9 downto 7) +8;
+            rs2_c <= instruction_in(4 downto 2) +8;
+            funct7_c <= "00000" & instruction_in(12) & instruction_in(5);
+        -- c.add - invalid when rd or rs2 equal 0, should we controll for that?
+        elsif(instruction_in(1 downto 0) = "10" and instruction_in(15 downto 12) = "1001") then 
+            opcode_c <= "0110011";
+            rd_c <= instruction_in(11 downto 7);
+            funct3_c <= "000";
+            rs1_c <= instruction_in(11 downto 7);
+            rs2_c <= instruction_in(6 downto 2);
+            funct7_c <= "0000000";
+        -- c. sub 
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 10) = "100011" and instruction_in(6 downto 5)="00") then 
+            opcode_c <= "0110011";
+            rd_c <= instruction_in(9 downto 7) + 8;
+            funct3_c <= "000";
+            rs1_c <= instruction_in(11 downto 7);
+            rs2_c <= instruction_in(6 downto 2);
+            funct7_c <= "0100000";
+            --c.addi -- for this one rd and rs1 is not allowed to be zero, sbould we program in that in vivado?
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "000") then 
+            opcode_c <= "0010011";
+            rd_c <= instruction_in(11 downto 7);
+            funct3_c <= "000";
+            rs1_c <= instruction_in(11 downto 7);
+            rs2_c <= imm_gen_out_c(4 downto 0);
+            funct7_c <= imm_gen_out_c(11 downto 5);
+            --c.and 
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 10) = "100011" and instruction_in(6 downto 5)="11") then 
+            opcode_c <= "0110011";
+            rd_c <= instruction_in(9 downto 7)+8;
+            funct3_c <= "111";
+            rs1_c <= instruction_in(9 downto 7)+8;
+            rs2_c <= instruction_in(4 downto 2)+8;
+            funct7_c <= "0000000";
+            --c.andi
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "100" and instruction_in(11 downto 10)="10") then 
+            opcode_c <= "0010011";
+            rd_c <= instruction_in(9 downto 7)+8;
+            funct3_c <= "111";
+            rs1_c <= instruction_in(9 downto 7)+8;
+            rs2_c <= imm_gen_out_c(4 downto 0);
+            funct7_c <= imm_gen_out_c(11 downto 5);
+            --c.or 
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 10) = "100011" and instruction_in(6 downto 5)="10") then 
+            opcode_c <= "0110011";
+            rd_c <= instruction_in(9 downto 7)+8;
+            funct3_c <= "110";
+            rs1_c <= instruction_in(9 downto 7)+8;
+            rs2_c <= instruction_in(4 downto 2)+8;
+            funct7_c <= "0000000";
+            --c.or 
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 10) = "100011" and instruction_in(6 downto 5)="01") then 
+            opcode_c <= "0110011";
+            rd_c <= instruction_in(9 downto 7)+8;
+            funct3_c <= "100";
+            rs1_c <= instruction_in(9 downto 7)+8;
+            rs2_c <= instruction_in(4 downto 2)+8;
+            funct7_c <= "0000000";
+            --c.mv
+        elsif(instruction_in(1 downto 0) = "10" and instruction_in(15 downto 12) = "1000") then 
+            opcode_c <= "0110011";
+            rd_c <= instruction_in(11 downto 7);
+            funct3_c <= "000";
+            rs1_c <= "00000";
+            rs2_c <= instruction_in(6 downto 2);
+            funct7_c <= "0000000";
+            --c.li
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "010") then 
+            opcode_c <= "0010011";
+            rd_c <= instruction_in(11 downto 7);
+            funct3_c <= "000";
+            rs1_c <= "00000";
+            rs2_c <= imm_gen_out_c(4 downto 0);
+            funct7_c <= imm_gen_out_c(11 downto 5);
+            --c.slli
+        elsif(instruction_in(1 downto 0) = "10" and instruction_in(15 downto 13) = "000") then 
+            opcode_c <= "0010011";
+            rd_c <= instruction_in(11 downto 7);
+            funct3_c <= "001";
+            rs1_c <= instruction_in(11 downto 7);
+            rs2_c <= instruction_in(6 downto 2);
+            funct7_c <= "000000" & instruction_in(12);
+            --c.srai
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "100" and instruction_in(11 downto 10)="01") then 
+            opcode_c <= "0010011";
+            rd_c <= instruction_in(9 downto 7)+8;
+            funct3_c <= "101";
+            rs1_c <= instruction_in(9 downto 7)+8;
+            rs2_c <= instruction_in(6 downto 2);
+            funct7_c <= "010000" & instruction_in(12);
+            --c.srli 
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "100" and instruction_in(11 downto 10)="00") then 
+            opcode_c <= "0010011";
+            rd_c <= instruction_in(9 downto 7)+8;
+            funct3_c <= "101";
+            rs1_c <= instruction_in(9 downto 7)+8;
+            rs2_c <= instruction_in(6 downto 2);
+            funct7_c <= "000000" & instruction_in(12);
+        else -- if no op_code fits we import a nop instruction. - has in instruction manual same format as addi, but here I just expand it to the Nop instruction in the common file. 
+            opcode_c <= NOP(6 downto 0);
+            rd_c <= NOP(11 downto 7);
+            funct3_c <= NOP(14 downto 12);
+            rs1_c <= NOP(19 downto 15);
+            rs2_c <= NOP(24 downto 20);
+            funct7_c <= NOP(31 downto 25);
+        end if; 
+    end process;
     
     immediate_genarator : process(instruction.opcode,imm_gen_out, instruction.opcode, imm_gen_out, instruction.funct7,instruction.rs2,instruction.rd) --only implemented to check a few opcodes, might need to be extended. 
     begin
@@ -135,7 +300,15 @@ begin
         read1_data => read_data_one,
         read2_data => read_data_two
     );
-
+    
+    inst_sign_extender_c : sign_extender
+    generic map ( I => 6,
+                  O => 12)
+    port map (  
+            input => imm_gen_in_c,
+            output  => imm_gen_out_c
+         );
+    
     inst_sign_extender : sign_extender
     generic map ( I => 12,
                   O => 32)
