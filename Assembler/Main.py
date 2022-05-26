@@ -1,11 +1,19 @@
+from cProfile import label
 import opcode
 from os import remove
+import string
 import sys
 from tabnanny import check
 from risc_v_32_constants import memonicToFunct                                          
 import risc_v_32_constants as constants
 
-lines, lineinfo, lineadr, labels = [], [], [], {}
+def twos_comp(val, bits):
+    """compute the 2's complement of int value val"""
+    if (val & (1 << (bits - 1))) != 0: # if sign bit is set e.g., 8bit: 128-255
+        val = val - (1 << bits)        # compute negative value
+    return val  & ((2 ** bits) - 1)
+
+lines, lineinfo, lineadr, labels, empty = [], [], [], {}, []
 LINEINFO_NONE, LINEINFO_ORG, LINEINFO_BEGIN, LINEINFO_END	= 0x00000, 0x10000, 0x20000, 0x40000
 
 
@@ -56,7 +64,9 @@ for i in range(len(lines)):                         # PASS 1: do PER LINE replac
 
     lines[i] = lines[i].split()                     # now split line into list of bytes (omitting whitepaces)
 
-    lineinfo.append(lines[i][0])
+    #makeing sure to remove line that is left after lone comment or label
+    if bool(lines[i]) : lineinfo.append(lines[i][0])
+    else: empty.append(i)
 
     for j in range(len(lines[i])-1, -1, -1):        # iterate from back to front while inserting stuff
         try: 
@@ -67,13 +77,28 @@ for i in range(len(lines)):                         # PASS 1: do PER LINE replac
                 lines[i][j] = str(val & 0xff)
                 lines[i].insert(j+1, str((val>>8) & 0xff))
 
+        
+## delete empty lines  and adjusting labels##
+iter = 0
+for i in empty:
+   del lines[i - iter]
+   iter = iter + 1
+   for key in labels:
+       if labels[key] > i:
+           labels[key] = labels[key] - 1
+   
+
+print(lines)
+print(lineinfo)
+print(labels)
 ########################### catering to specific intructions ###########################################
 for i in range(len(lines)):
     opcode = lines[i][0]
     ### integer instruction ###
+    
     if opcode == '0010011' or opcode == '0000011':
-        if(len(lines) != 4 ):
-            raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
+        if(len(lines[i]) != 4 ):
+           raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
         lines[i][1] = "{:05b}".format(int(lines[i][1]))
         funct = constants.memonicToFunct[lineinfo[i]]
         lines[i].insert(2,funct)
@@ -81,7 +106,7 @@ for i in range(len(lines)):
         lines[i][4] = "{:012b}".format(int(lines[i][4]))
     ### Register instructions ##
     elif opcode == '0110011':
-        if(len(lines) != 4 ):
+        if(len(lines[i]) != 4 ):
             raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
         lines[i][1] = "{:05b}".format(int(lines[i][1]))
         funct = constants.memonicToFunct[lineinfo[i]]
@@ -91,15 +116,65 @@ for i in range(len(lines)):
         lines[i].append(constants.memonicToImm[lineinfo[i]])
     ### store instructions
     elif opcode == '0100011':
-         if(len(lines) != 4 ):
+        if(len(lines[i]) != 4 ):
             raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
+        imm = "{:012b}".format(int(lines[i][3]))
+        imm115 = imm[0:7]
+        imm40 = imm[7:]
+        lines[i].insert(1,constants.memonicToFunct[lineinfo[i]])
+        lines[i].insert(1,imm40)
+        lines[i][3] = "{:05b}".format(int(lines[i][3]))
+        lines[i][4] = "{:05b}".format(int(lines[i][4]))
+        lines[i][5] = imm115
+    ### Branch instructions
+    elif opcode == '1100011':
+        if(len(lines[i]) != 4 ):
+            raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
+        label = lines[i][3]
+        if label not in labels:
+            raise Exception("Label " + label + " around line " + str(i+1) + " is not recognized")
+        lineDist = i - labels[label]
+        print(lineDist)
+        relativeLineAdress = 0;
+        linechecker = i;
+        while linechecker != labels[label]:
+            if lineDist > 0:
+                if lineinfo[linechecker - 1][0] == 'C':
+                    relativeLineAdress = relativeLineAdress - 2
+                else:
+                    relativeLineAdress = relativeLineAdress - 4
+                linechecker = linechecker - 1
+            if lineDist < 0:
+                if lineinfo[linechecker + 1][0] == 'C':
+                    relativeLineAdress = relativeLineAdress + 2
+                else:
+                    relativeLineAdress = relativeLineAdress + 4
+                linechecker = linechecker + 1
+        print(relativeLineAdress)
+        if relativeLineAdress > 0:
+            imm = "{:013b}".format(abs(relativeLineAdress))
+        else:
+            imm = bin(relativeLineAdress & 0b1111111111111)
+            imm = imm[2:]
+        print(imm)
+        lines[i][1] = "{:05b}".format(int(lines[i][1]))
+        lines[i][2] = "{:05b}".format(int(lines[i][2]))
+        imm117 = imm[9:12] + "11"
+        imm12105 = imm[0] + imm[2:7]
+        lines[i].insert(1,imm117)
+        lines[i].insert(2,memonicToFunct[lineinfo[i]])
+        lines[i][5] = imm12105
+    else:
+        raise Exception( lineinfo[i] + " around line " + str(i+1) +" cannot be parsed either something is wrong or the command is not yet implemented")    
+    
     ### concatenating the instruction into one sting ###
-    #lines[i].reverse()
     """
+    lines[i].reverse()
     concat_string = ""
     for inst in lines[i]:
        concat_string =  concat_string + inst
     lines[i] = concat_string
+    if(lines[i].lenght != 32): Exception("Line " ++ i ++ " is the wrong number of bits")    
     """        
 
 
