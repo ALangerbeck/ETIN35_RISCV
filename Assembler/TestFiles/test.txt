@@ -1,4 +1,11 @@
 label1: addi 1 2 3 ;what is this
 addi 2 3 1
-jal 1 label
+label2:
 add 1 2 3
+; feck
+sb 1 2 23
+beq 1 1 label3
+addi 2 3 1
+addi 3 2 3
+label3:
+addi 3 5 1
