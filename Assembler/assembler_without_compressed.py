@@ -4,8 +4,11 @@ from os import remove
 import string
 import sys
 from tabnanny import check
+
+from nbformat import write
 from risc_v_32_constants import memonicToFunct                                          
 import risc_v_32_constants as constants
+from textwrap import wrap
 
 def twos_comp(val, bits):
     """compute the 2's complement of int value val"""
@@ -88,9 +91,9 @@ for i in empty:
            labels[key] = labels[key] - 1
    
 
-print(lines)
-print(lineinfo)
-print(labels)
+#print(lines)
+#print(lineinfo)
+#print(labels)
 ########################### catering to specific intructions ###########################################
 for i in range(len(lines)):
     opcode = lines[i][0]
@@ -134,7 +137,7 @@ for i in range(len(lines)):
         if label not in labels:
             raise Exception("Label " + label + " around line " + str(i+1) + " is not recognized")
         lineDist = i - labels[label]
-        print(lineDist)
+        #print(lineDist)
         relativeLineAdress = 0;
         linechecker = i;
         while linechecker != labels[label]:
@@ -150,7 +153,7 @@ for i in range(len(lines)):
                 else:
                     relativeLineAdress = relativeLineAdress + 4
                 linechecker = linechecker + 1
-        print(relativeLineAdress)
+        #print(relativeLineAdress)
         if relativeLineAdress > 0:
             imm = "{:013b}".format(abs(relativeLineAdress))
         else:
@@ -159,26 +162,33 @@ for i in range(len(lines)):
         print(imm)
         lines[i][1] = "{:05b}".format(int(lines[i][1]))
         lines[i][2] = "{:05b}".format(int(lines[i][2]))
-        imm117 = imm[9:12] + "11"
-        imm12105 = imm[0] + imm[2:7]
+        imm117 = imm[8:12] + "11"
+        print(imm117)
+        imm3425 = imm[0] + imm[2:7]
         lines[i].insert(1,imm117)
         lines[i].insert(2,memonicToFunct[lineinfo[i]])
-        lines[i][5] = imm12105
+        lines[i][5] = imm3425
     else:
         raise Exception( lineinfo[i] + " around line " + str(i+1) +" cannot be parsed either something is wrong or the command is not yet implemented")    
     
     ### concatenating the instruction into one sting ###
-    """
+    
     lines[i].reverse()
     concat_string = ""
     for inst in lines[i]:
        concat_string =  concat_string + inst
     lines[i] = concat_string
-    if(lines[i].lenght != 32): Exception("Line " ++ i ++ " is the wrong number of bits")    
-    """        
+    if(len(lines[i]) != 32): Exception("Line " + str(i) + " is the wrong number of bits")    
+    lines[i] = lines[i] + "\n"
+    
+    lines[i] = wrap(lines[i],8)
+    lines[i].reverse()
+    lines[i] = [element + "\n" for element in lines[i]]
 
+with open('output.mem', 'w') as f:
+    for line in lines:
+        f.writelines(line)
 
 print(lines)
 print(lineinfo)
-print(line)
 print(labels)
