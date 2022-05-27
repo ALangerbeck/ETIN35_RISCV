@@ -1,1 +1,7 @@
-c.lw 1,2,24
+label1: 
+    addi 1 , 0,   1000
+    addi 2 , 1,   2000
+    addi 3 , 2,  1000
+    addi 4 , 3,  2000
+    addi 5 , 4,   1000
+    beq 1 , 1 ,label1

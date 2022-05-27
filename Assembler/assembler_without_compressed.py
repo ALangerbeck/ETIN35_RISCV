@@ -91,9 +91,9 @@ for i in empty:
            labels[key] = labels[key] - 1
    
 
-#print(lines)
-#print(lineinfo)
-#print(labels)
+print(lines)
+print(lineinfo)
+print(labels)
 ########################### catering to specific intructions ###########################################
 for i in range(len(lines)):
     opcode = lines[i][0]
@@ -106,7 +106,7 @@ for i in range(len(lines)):
         funct = constants.memonicToFunct[lineinfo[i]]
         lines[i].insert(2,funct)
         lines[i][3] = "{:05b}".format(int(lines[i][3]))
-        lines[i][4] = "{:012b}".format(int(lines[i][4]))
+        lines[i][4] = "{:012b}".format((int(lines[i][4])))
     ### Register instructions ##
     elif opcode == '0110011':
         if(len(lines[i]) != 4 ):
@@ -156,15 +156,16 @@ for i in range(len(lines)):
         #print(relativeLineAdress)
         if relativeLineAdress > 0:
             imm = "{:013b}".format(abs(relativeLineAdress))
+        elif relativeLineAdress == 0:
+            imm ="0000000000000"
         else:
             imm = bin(relativeLineAdress & 0b1111111111111)
             imm = imm[2:]
-        print(imm)
         lines[i][1] = "{:05b}".format(int(lines[i][1]))
         lines[i][2] = "{:05b}".format(int(lines[i][2]))
-        imm117 = imm[8:12] + "11"
-        print(imm117)
-        imm3425 = imm[0] + imm[2:7]
+        imm117 = imm[8:12] + imm[1] 
+   
+        imm3425 = imm[0] + (imm[2:8])
         lines[i].insert(1,imm117)
         lines[i].insert(2,memonicToFunct[lineinfo[i]])
         lines[i][5] = imm3425
@@ -173,13 +174,14 @@ for i in range(len(lines)):
     
     ### concatenating the instruction into one sting ###
     
+    
     lines[i].reverse()
+    print(lines[i])
     concat_string = ""
     for inst in lines[i]:
-       concat_string =  concat_string + inst
+        concat_string =  concat_string + inst
     lines[i] = concat_string
     if(len(lines[i]) != 32): Exception("Line " + str(i) + " is the wrong number of bits")    
-    lines[i] = lines[i] + "\n"
     
     lines[i] = wrap(lines[i],8)
     lines[i].reverse()
