@@ -1,6 +1,8 @@
 from cProfile import label
 import opcode
 from os import remove
+from re import sub
+from shutil import ExecError
 import string
 import sys
 from tabnanny import check
@@ -91,9 +93,9 @@ for i in empty:
            labels[key] = labels[key] - 1
    
 
-print(lines)
-print(lineinfo)
-print(labels)
+#print(lines)
+#print(lineinfo)
+#print(labels)
 ########################### catering to specific intructions ###########################################
 for i in range(len(lines)):
     opcode = lines[i][0]
@@ -107,7 +109,7 @@ for i in range(len(lines)):
         lines[i].insert(2,funct)
         lines[i][3] = "{:05b}".format(int(lines[i][3]))
         lines[i][4] = "{:012b}".format((int(lines[i][4])))
-    ### Register instructions ##
+    ### Register instructions ###
     elif opcode == '0110011':
         if(len(lines[i]) != 4 ):
             raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
@@ -117,7 +119,7 @@ for i in range(len(lines)):
         lines[i][3] = "{:05b}".format(int(lines[i][3]))
         lines[i][4] = "{:05b}".format(int(lines[i][4]))
         lines[i].append(constants.memonicToImm[lineinfo[i]])
-    ### store instructions
+    ### store instructions ###
     elif opcode == '0100011':
         if(len(lines[i]) != 4 ):
             raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
@@ -129,7 +131,7 @@ for i in range(len(lines)):
         lines[i][3] = "{:05b}".format(int(lines[i][3]))
         lines[i][4] = "{:05b}".format(int(lines[i][4]))
         lines[i][5] = imm115
-    ### Branch instructions
+    ### Branch instructions ###
     elif opcode == '1100011':
         if(len(lines[i]) != 4 ):
             raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
@@ -171,7 +173,46 @@ for i in range(len(lines)):
         lines[i][5] = imm3425
     ### compressed ###
     elif opcode == "00": #compressed sw & lw 
-        print("stuff")
+        funct = memonicToFunct[lineinfo[i]]
+        rs1p = "{:03b}".format(int(lines[i][1]))
+        rs2p = "{:03b}".format(int(lines[i][2]))
+        uimm = "{:07b}".format(int(lines[i][3]))
+        lines[i] = [opcode,rs2p,uimm[4]+uimm[0],rs1p,uimm[1:4],funct]
+        print(lines[i])
+    elif opcode == "10": #compressed add,
+        rd = "{:05b}".format(int(lines[i][1]))
+        rs1 = "{:05b}".format(int(lines[i][2]))
+        
+        if lineinfo[i] == "c.add":
+            bit12 = '1'
+        else:
+            Exception("unrecognized compressed instruction arount line " + str(i))
+        funct = constants.memonicToFunct[lineinfo[i]]
+        lines[i] = [opcode,rs1,rd,bit12,funct]
+    elif opcode == "01": #compressed addi,sub,and
+        if lineinfo[i] == "c.addi":
+            rd = "{:05b}".format(int(lines[i][1]))
+            imm = "{:06b}".format(int(lines[i][2]))
+            funct = constants.memonicToFunct[lineinfo[i]]
+            lines[i] = [opcode,imm[1:6],rd,imm[0],funct]
+        elif lineinfo[i] == "c.sub" or lineinfo[i] == "c.and":
+            rdp = "{:03b}".format(int(lines[i][1]))
+            rs2p = "{:03b}".format(int(lines[i][2]))
+            if(lineinfo[i] == 'c.sub'):
+                funct = "00"
+                funct2 = "100011"
+            elif(lineinfo[i] == "c.and"):
+                funct = "11"
+                funct2 = "100011"
+            else: 
+                Exception("unrecognized compressed instruction arount line " + str(i))
+            lines[i] = [opcode,rs2p,funct,rdp,funct2]
+        elif lineinfo[i] == "c.andi":
+            rdp = "{:03b}".format(int(lines[i][1]))
+            imm = "{:06b}".format(int(lines[i][1]))
+            lines[i] = [opcode,imm[1:6],rdp,"10",imm[0],constants.memonicToFunct[lineinfo[i]]]
+        else:
+            Exception("unrecognized compressed instruction arount line " + str(i))
     else:
         raise Exception( lineinfo[i] + " around line " + str(i+1) +" cannot be parsed either something is wrong or the command is not yet implemented")    
     
@@ -179,7 +220,6 @@ for i in range(len(lines)):
     
     
     lines[i].reverse()
-    print(lines[i])
     concat_string = ""
     for inst in lines[i]:
         concat_string =  concat_string + inst

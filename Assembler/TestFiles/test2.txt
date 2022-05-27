@@ -1,7 +1,9 @@
 label1: 
     addi 1 , 0,   1000
-    addi 2 , 1,   2000
-    addi 3 , 2,  1000
-    addi 4 , 3,  2000
-    addi 5 , 4,   1000
     beq 1 , 1 ,label1
+    c.sw 1,1,1
+    c.add 1,1
+    c.addi 1, 27
+    c.sub 1,2
+    c.and 1,2
+    c.andi 1, 45
