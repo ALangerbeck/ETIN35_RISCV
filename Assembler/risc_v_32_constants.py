@@ -10,8 +10,8 @@ opcodes = {"lui": "0110111", "auipc": "0010111",
             "fence" : "0001111" , "fence.i" : "0001111",
             "ecall" : "1110011" , "ebreak" : "1110011" , "csrrw" : "1110011" ,"csrrs" : "1110011", "csrrc" : "1110011" , "csrrwi" : "1110011", "csrrsi" : "1110011", "csrrci" : "1110011",
             "c.sw" : "00", "c.lw" : "00",
-            "c.add" : "10", 
-            "c.sub" : "01","c.addi" : "01","c.and":"01", "c.andi":"01"}
+            "c.add" : "10", "c.mv": "10", "c.slli":"10", 
+            "c.sub" : "01","c.addi" : "01","c.and":"01", "c.andi":"01", "c.or": "01","c.xor": "01","c.li":"01", "c.lui":"01", "c.srai": "01", "c.srli":"01"}
 
 memonicToFunct={
                 "jalr" : "000",
@@ -23,7 +23,8 @@ memonicToFunct={
                 "fence" : "000" , "fence.i" : "001",
                 "ecall" : "000" , "ebreak" : "000" , "csrrw" : "001" ,"csrrs" : "010", "csrrc" : "011" , "csrrwi" : "101", "csrrsi" : "110", "csrrci" : "111",
                 "c.lw": "010", "c.sw": "110" ,
-                "c.add":"100","c.addi": "000" ,"c.andi":"100"}
+                "c.add":"100","c.andi":"100","c.mv": "100" ,"c.addi": "000", "c.li": "010", "c.lui" : "011", "c.slli":"000",
+                "c.srai" : "100", "c.srli":"100"}
 
 memonicToImm = {"add" : "0000000", "sub" : "0100000","sll":"0000000", "slt":"0000000","sltu":"0000000","xor":"0000000","srl":"0000000","sra":"0100000"
                 ,"or":"0000000","and":"0000000"}

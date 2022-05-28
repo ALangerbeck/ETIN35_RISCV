@@ -3,7 +3,7 @@ label1:
     beq 1 , 1 ,label1
     c.sw 1,1,1
     c.add 1,1
-    c.addi 1, 27
-    c.sub 1,2
-    c.and 1,2
-    c.andi 1, 45
+label2:
+    c.srli 1 35
+    bne 1 1 label2
+    bne 1 1 label1

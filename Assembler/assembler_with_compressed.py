@@ -178,24 +178,36 @@ for i in range(len(lines)):
         rs2p = "{:03b}".format(int(lines[i][2]))
         uimm = "{:07b}".format(int(lines[i][3]))
         lines[i] = [opcode,rs2p,uimm[4]+uimm[0],rs1p,uimm[1:4],funct]
-        print(lines[i])
+    
     elif opcode == "10": #compressed add,
         rd = "{:05b}".format(int(lines[i][1]))
-        rs1 = "{:05b}".format(int(lines[i][2]))
-        
-        if lineinfo[i] == "c.add":
-            bit12 = '1'
-        else:
-            Exception("unrecognized compressed instruction arount line " + str(i))
         funct = constants.memonicToFunct[lineinfo[i]]
-        lines[i] = [opcode,rs1,rd,bit12,funct]
-    elif opcode == "01": #compressed addi,sub,and
-        if lineinfo[i] == "c.addi":
+        if lineinfo[i] in ["c.add","c.mv"]:
+            rs1 = "{:05b}".format(int(lines[i][2]))
+            if lineinfo[i] == "c.add":
+                bit12 = '1'
+            elif lineinfo[i] == "c.mv":
+                bit12 = '0'
+            lines[i] = [opcode,rs1,rd,bit12,funct]
+        elif lineinfo[i] == "c.slli":
+            uimm = "{:06b}".format(int(lines[i][2]))
+            lines[i] = [opcode,uimm[1:6],rd,uimm[0],funct]
+        else:
+            Exception("unrecognized compressed instruction arount line " + str(i))   
+    
+    elif opcode == "01": #compressed addi,sub,and, li,,lui,or,xor
+        if lineinfo[i] in ["c.addi","c.li", "c.lui"]:
             rd = "{:05b}".format(int(lines[i][1]))
-            imm = "{:06b}".format(int(lines[i][2]))
             funct = constants.memonicToFunct[lineinfo[i]]
-            lines[i] = [opcode,imm[1:6],rd,imm[0],funct]
-        elif lineinfo[i] == "c.sub" or lineinfo[i] == "c.and":
+            if lineinfo[i] in ["c.addi","c.li"]:
+                imm = "{:06b}".format(int(lines[i][2]))
+                lines[i] = [opcode,imm[1:6],rd,imm[0],funct]
+            elif lineinfo[i] == "c.lui":
+                imm = "{:018b}".format(int(lines[i][2]))
+                lines[i] = [opcode,imm[1:6],rd,imm[0],funct]
+        
+        
+        elif lineinfo[i] in ["c.sub","c.and","c.or","c.xor"]:
             rdp = "{:03b}".format(int(lines[i][1]))
             rs2p = "{:03b}".format(int(lines[i][2]))
             if(lineinfo[i] == 'c.sub'):
@@ -204,15 +216,29 @@ for i in range(len(lines)):
             elif(lineinfo[i] == "c.and"):
                 funct = "11"
                 funct2 = "100011"
-            else: 
-                Exception("unrecognized compressed instruction arount line " + str(i))
+            elif lineinfo[i] == "c.or":
+                funct = "00"
+                funct2= "100011"
+            elif lineinfo[i] == "c.xor":
+                funct = "01"
+                funct2 = "100011"
             lines[i] = [opcode,rs2p,funct,rdp,funct2]
-        elif lineinfo[i] == "c.andi":
+        
+        elif lineinfo[i] in ["c.andi","c.srli","c.srai"]:
             rdp = "{:03b}".format(int(lines[i][1]))
             imm = "{:06b}".format(int(lines[i][1]))
-            lines[i] = [opcode,imm[1:6],rdp,"10",imm[0],constants.memonicToFunct[lineinfo[i]]]
+            funct = constants.memonicToFunct[lineinfo[i]]
+            if lineinfo[i] == "c.andi":
+                funct2 = "10"
+            elif lineinfo[i] == "c.srai":
+                funct2 = "01"
+            elif lineinfo[i] == "c.srli":
+                funct2 = "00"
+            lines[i] = [opcode,imm[1:6],rdp,funct2,imm[0],funct]
+        
         else:
             Exception("unrecognized compressed instruction arount line " + str(i))
+    
     else:
         raise Exception( lineinfo[i] + " around line " + str(i+1) +" cannot be parsed either something is wrong or the command is not yet implemented")    
     
