@@ -8,15 +8,10 @@ import sys
 from tabnanny import check
 
 from nbformat import write
+from sqlalchemy import func
 from risc_v_32_constants import memonicToFunct                                          
 import risc_v_32_constants as constants
 from textwrap import wrap
-
-def twos_comp(val, bits):
-    """compute the 2's complement of int value val"""
-    if (val & (1 << (bits - 1))) != 0: # if sign bit is set e.g., 8bit: 128-255
-        val = val - (1 << bits)        # compute negative value
-    return val  & ((2 ** bits) - 1)
 
 lines, lineinfo, lineadr, labels, empty = [], [], [], {}, []
 LINEINFO_NONE, LINEINFO_ORG, LINEINFO_BEGIN, LINEINFO_END	= 0x00000, 0x10000, 0x20000, 0x40000
@@ -100,37 +95,36 @@ for i in empty:
 for i in range(len(lines)):
     opcode = lines[i][0]
     ### integer instruction ###
-    
     if opcode == '0010011' or opcode == '0000011':
         if(len(lines[i]) != 4 ):
            raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
-        lines[i][1] = "{:05b}".format(int(lines[i][1]))
+        rd = "{:05b}".format(int(lines[i][1]))
         funct = constants.memonicToFunct[lineinfo[i]]
-        lines[i].insert(2,funct)
-        lines[i][3] = "{:05b}".format(int(lines[i][3]))
-        lines[i][4] = "{:012b}".format((int(lines[i][4])))
+        rs1 = "{:05b}".format(int(lines[i][2]))
+        imm ="{:012b}".format(int(lines[i][3]) & 0b111111111111)
+        lines[i] = [opcode,rd,funct,rs1,imm]
     ### Register instructions ###
     elif opcode == '0110011':
         if(len(lines[i]) != 4 ):
             raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
-        lines[i][1] = "{:05b}".format(int(lines[i][1]))
+        lines[i][1]
+        rd = "{:05b}".format(int(lines[i][1]))
+        rs1 = "{:05b}".format(int(lines[i][2]))
+        rs2 = "{:05b}".format(int(lines[i][3]))
         funct = constants.memonicToFunct[lineinfo[i]]
-        lines[i].insert(2,funct)
-        lines[i][3] = "{:05b}".format(int(lines[i][3]))
-        lines[i][4] = "{:05b}".format(int(lines[i][4]))
-        lines[i].append(constants.memonicToImm[lineinfo[i]])
+        imm = constants.memonicToImm[lineinfo[i]]
+        lines[i] = [opcode,rd,funct,rs1,rs2,imm]
     ### store instructions ###
     elif opcode == '0100011':
         if(len(lines[i]) != 4 ):
             raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
-        imm = "{:012b}".format(int(lines[i][3]))
-        imm115 = imm[0:7]
-        imm40 = imm[7:]
-        lines[i].insert(1,constants.memonicToFunct[lineinfo[i]])
-        lines[i].insert(1,imm40)
-        lines[i][3] = "{:05b}".format(int(lines[i][3]))
-        lines[i][4] = "{:05b}".format(int(lines[i][4]))
-        lines[i][5] = imm115
+        funct = constants.memonicToFunct[lineinfo[i]]
+        rs1 = "{:05b}".format(int(lines[i][1]))
+        rs2 = "{:05b}".format(int(lines[i][2]))
+        imm = "{:012b}".format(int(lines[i][3]) & 0b111111111111)
+        imm3125 = imm[0:7]
+        imm117 = imm[7:]
+        lines[i] = [opcode,imm117,funct,rs1,rs2,imm3125]
     ### Branch instructions ###
     elif opcode == '1100011':
         if(len(lines[i]) != 4 ):
@@ -156,21 +150,22 @@ for i in range(len(lines)):
                     relativeLineAdress = relativeLineAdress + 4
                 linechecker = linechecker + 1
         #print(relativeLineAdress)
+        """
         if relativeLineAdress > 0:
-            imm = "{:013b}".format(abs(relativeLineAdress))
+            imm = "{:013b}".format(abs(relativeLineAdress) & 0b1111111111111)
         elif relativeLineAdress == 0:
             imm ="0000000000000"
         else:
             imm = bin(relativeLineAdress & 0b1111111111111)
             imm = imm[2:]
-        lines[i][1] = "{:05b}".format(int(lines[i][1]))
-        lines[i][2] = "{:05b}".format(int(lines[i][2]))
+        """
+        imm = "{:013b}".format(int(relativeLineAdress) & 0b1111111111111)
+        rs1 = "{:05b}".format(int(lines[i][1]))
+        rs2 = "{:05b}".format(int(lines[i][2]))
         imm117 = imm[8:12] + imm[1] 
-   
-        imm3425 = imm[0] + (imm[2:8])
-        lines[i].insert(1,imm117)
-        lines[i].insert(2,memonicToFunct[lineinfo[i]])
-        lines[i][5] = imm3425
+        imm3125 = imm[0] + (imm[2:8])
+        funct = constants.memonicToFunct[lineinfo[i]]
+        lines[i] = [opcode,imm117,funct,rs1,rs2,imm3125]
     ### compressed ###
     elif opcode == "00": #compressed sw & lw 
         funct = memonicToFunct[lineinfo[i]]
@@ -243,7 +238,7 @@ for i in range(len(lines)):
         raise Exception( lineinfo[i] + " around line " + str(i+1) +" cannot be parsed either something is wrong or the command is not yet implemented")    
     
     ### concatenating the instruction into one sting ###
-    
+    print(lines[i])
     
     lines[i].reverse()
     concat_string = ""
@@ -255,6 +250,8 @@ for i in range(len(lines)):
     lines[i] = wrap(lines[i],8)
     lines[i].reverse()
     lines[i] = [element + "\n" for element in lines[i]]
+    if i == max(range(len(lines))):
+        lines[i][len(lines[i]) - 1] = lines[i][len(lines[i]) - 1][:-1]
 
 with open('output.mem', 'w') as f:
     for line in lines:
