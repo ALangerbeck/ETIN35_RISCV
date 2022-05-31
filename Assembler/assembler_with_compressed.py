@@ -15,7 +15,7 @@ from textwrap import wrap
 
 lines, lineinfo, lineadr, labels, empty = [], [], [], {}, []
 LINEINFO_NONE, LINEINFO_ORG, LINEINFO_BEGIN, LINEINFO_END	= 0x00000, 0x10000, 0x20000, 0x40000
-DEBUG = False
+DEBUG = True
 
 
 if len(sys.argv) < 2: print('USAGE: asm.py <sourcefile> [-s[<tag>]]'); exit(1)
@@ -123,13 +123,13 @@ for i in range(len(lines)):
         linechecker = i;
         while linechecker != labels[label]:
             if lineDist > 0:
-                if lineinfo[linechecker - 1][0] == 'C':
+                if lineinfo[linechecker - 1][0] == 'c':
                     relativeLineAdress = relativeLineAdress - 2
                 else:
                     relativeLineAdress = relativeLineAdress - 4
                 linechecker = linechecker - 1
             if lineDist < 0:
-                if lineinfo[linechecker + 1][0] == 'C':
+                if lineinfo[linechecker + 1][0] == 'c':
                     relativeLineAdress = relativeLineAdress + 2
                 else:
                     relativeLineAdress = relativeLineAdress + 4
@@ -214,7 +214,10 @@ for i in range(len(lines)):
         raise Exception( lineinfo[i] + " around line " + str(i+1) +" cannot be parsed either something is wrong or the command is not yet implemented")    
     
     ### concatenating the instruction into one sting ###
-    if (DEBUG) : print(lines[i])
+    if (DEBUG) : 
+        print(lineinfo[i],end = "") 
+        print(" : ",end = "")
+        print(lines[i])
     
     lines[i].reverse()
     concat_string = ""
