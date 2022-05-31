@@ -128,9 +128,9 @@ begin
         -- verkar som funct3_c <= instruction_in(15 downto 13); -- not for sw
         if(instruction_in(1 downto 0) = "00" and instruction_in(15 downto 13) =  "010") then --c.lw
             opcode_c <= "0000011";
-            rd_c <= instruction_in(4 downto 2) +8;
+            rd_c <= ( "00" & instruction_in(4 downto 2)) +8;
             funct3_c <= "010";
-            rs1_c <= instruction_in(9 downto 7) +8;
+            rs1_c <= ( "00" & instruction_in(9 downto 7)) +8;
             rs2_c <= instruction_in(11 downto 10) & instruction_in(6) & "00";
             funct7_c <= "00000" & instruction_in(12) & instruction_in(5);
         -- c.sw
@@ -138,8 +138,8 @@ begin
             opcode_c <= "0100011";
             rd_c <= instruction_in(11 downto 10) & instruction_in(6) & "00";
             funct3_c <= "010";
-            rs1_c <= instruction_in(9 downto 7) +8;
-            rs2_c <= instruction_in(4 downto 2) +8;
+            rs1_c <= ("00" & instruction_in(9 downto 7)) +8;
+            rs2_c <= ( "00" & instruction_in(4 downto 2)) +8;
             funct7_c <= "00000" & instruction_in(12) & instruction_in(5);
         -- c.add - invalid when rd or rs2 equal 0, should we controll for that?
         elsif(instruction_in(1 downto 0) = "10" and instruction_in(15 downto 12) = "1001") then 
@@ -152,10 +152,10 @@ begin
         -- c. sub 
         elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 10) = "100011" and instruction_in(6 downto 5)="00") then 
             opcode_c <= "0110011";
-            rd_c <= instruction_in(9 downto 7) + 8;
+            rd_c <= ( "00" & instruction_in(9 downto 7)) + 8;
             funct3_c <= "000";
-            rs1_c <= instruction_in(9 downto 7) + 8;
-            rs2_c <= instruction_in(4 downto 2) + 8;
+            rs1_c <= ( "00" & instruction_in(9 downto 7)) + 8;
+            rs2_c <= ( "00" & instruction_in(4 downto 2)) + 8;
             funct7_c <= "0100000";
             --c.addi -- for this one rd and rs1 is not allowed to be zero, sbould we program in that in vivado?
         elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "000") then 
@@ -168,34 +168,34 @@ begin
             --c.and 
         elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 10) = "100011" and instruction_in(6 downto 5)="11") then 
             opcode_c <= "0110011";
-            rd_c <= instruction_in(9 downto 7)+8;
+            rd_c <= ( "00" & instruction_in(9 downto 7))+8;
             funct3_c <= "111";
-            rs1_c <= instruction_in(9 downto 7)+8;
-            rs2_c <= instruction_in(4 downto 2)+8;
+            rs1_c <= ( "00" & instruction_in(9 downto 7))+8;
+            rs2_c <= ( "00" & instruction_in(4 downto 2))+8;
             funct7_c <= "0000000";
             --c.andi
         elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "100" and instruction_in(11 downto 10)="10") then 
             opcode_c <= "0010011";
-            rd_c <= instruction_in(9 downto 7)+8;
+            rd_c <= ( "00" & instruction_in(9 downto 7))+8;
             funct3_c <= "111";
-            rs1_c <= instruction_in(9 downto 7)+8;
+            rs1_c <= ( "00" & instruction_in(9 downto 7))+8;
             rs2_c <= imm_gen_out_c(4 downto 0);
             funct7_c <= imm_gen_out_c(11 downto 5);
             --c.or 
         elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 10) = "100011" and instruction_in(6 downto 5)="10") then 
             opcode_c <= "0110011";
-            rd_c <= instruction_in(9 downto 7)+8;
+            rd_c <= ( "00" & instruction_in(9 downto 7))+8;
             funct3_c <= "110";
-            rs1_c <= instruction_in(9 downto 7)+8;
-            rs2_c <= instruction_in(4 downto 2)+8;
+            rs1_c <= ( "00" & instruction_in(9 downto 7))+8;
+            rs2_c <= ( "00" & instruction_in(4 downto 2))+8;
             funct7_c <= "0000000";
             --c.or 
         elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 10) = "100011" and instruction_in(6 downto 5)="01") then 
             opcode_c <= "0110011";
-            rd_c <= instruction_in(9 downto 7)+8;
+            rd_c <= ( "00" & instruction_in(9 downto 7))+8;
             funct3_c <= "100";
-            rs1_c <= instruction_in(9 downto 7)+8;
-            rs2_c <= instruction_in(4 downto 2)+8;
+            rs1_c <= ( "00" & instruction_in(9 downto 7))+8;
+            rs2_c <= ( "00" & instruction_in(4 downto 2))+8;
             funct7_c <= "0000000";
             --c.mv
         elsif(instruction_in(1 downto 0) = "10" and instruction_in(15 downto 12) = "1000") then 
@@ -224,17 +224,17 @@ begin
             --c.srai
         elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "100" and instruction_in(11 downto 10)="01") then 
             opcode_c <= "0010011";
-            rd_c <= instruction_in(9 downto 7)+8;
+            rd_c <= ( "00" & instruction_in(9 downto 7))+8;
             funct3_c <= "101";
-            rs1_c <= instruction_in(9 downto 7)+8;
+            rs1_c <= ( "00" & instruction_in(9 downto 7))+8;
             rs2_c <= instruction_in(6 downto 2);
             funct7_c <= "010000" & instruction_in(12);
             --c.srli 
         elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "100" and instruction_in(11 downto 10)="00") then 
             opcode_c <= "0010011";
-            rd_c <= instruction_in(9 downto 7)+8;
+            rd_c <= ( "00" & instruction_in(9 downto 7))+8;
             funct3_c <= "101";
-            rs1_c <= instruction_in(9 downto 7)+8;
+            rs1_c <= ( "00" & instruction_in(9 downto 7))+8;
             rs2_c <= instruction_in(6 downto 2);
             funct7_c <= "000000" & instruction_in(12);
         else -- if no op_code fits we import a nop instruction. - has in instruction manual same format as addi, but here I just expand it to the Nop instruction in the common file. 

@@ -2,6 +2,7 @@
     addi 2, 0, 7              ; loop limit
     addi 8, 0, 1              ; fibonacci no. 1
     addi 9, 0, 1              ; fibonacci no. 2
+    addi 10,0,0
 LOOP:
     c.addi 1, 1              ; counter++
     beq 2, 1, DONE            ; if counter == loop limit then done!
@@ -9,8 +10,10 @@ LOOP:
     c.add 9, 8              ; fib no. 2 = fib no. 1 + fib no. 2
     beq 0, 0, LOOP            ; Jump back and repeat
 DONE:
-    sw 0, 3, 0                ; Mem[0] = fib no. 1
-    sw 0, 4, 1                ; Mem[1] = fib no. 2
+    c.sw 2, 0, 0             ; Mem[0] = fib no. 1
+    c.sw 2, 1, 1                ; Mem[1] = fib no. 2
+    c.lw 3, 2, 0
+    c.lw 4, 2, 1
     add 0, 0, 0              ; NOPs ...
     add 0, 0, 0
     add 0, 0, 0
