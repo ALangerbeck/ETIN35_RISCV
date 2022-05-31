@@ -7,8 +7,8 @@ import string
 import sys
 from tabnanny import check
 
-from nbformat import write
-from sqlalchemy import func
+#from nbformat import write
+#from sqlalchemy import func
 from risc_v_32_constants import memonicToFunct                                          
 import risc_v_32_constants as constants
 from textwrap import wrap
