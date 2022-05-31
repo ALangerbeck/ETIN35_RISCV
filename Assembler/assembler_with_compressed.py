@@ -49,12 +49,12 @@ for i in range(len(lines)):                         # PASS 1: do PER LINE replac
     lines[i] = lines[i].split()                     # now split line into list of bytes (omitting whitepaces)
 
     #makeing sure to remove line that is left after lone comment or label
-    if bool(lines[i]) : lineinfo.append(lines[i][0])
+    if bool(lines[i]) : lineinfo.append(lines[i][0].lower())
     else: empty.append(i)
 
     for j in range(len(lines[i])-1, -1, -1):        # iterate from back to front while inserting stuff
         try: 
-            lines[i][j] = constants.opcodes[lines[i][j]]     # try replacing mnemonic with opcode
+            lines[i][j] = constants.opcodes[lines[i][j].lower()]     # try replacing mnemonic with opcode
         except: 
             if lines[i][j].find('0x') == 0 and len(lines[i][j]) > 4:    # replace '0xWORD' with 'LSB MSB'
                 val = int(lines[i][j], 16)
