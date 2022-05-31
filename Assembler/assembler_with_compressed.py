@@ -15,6 +15,7 @@ from textwrap import wrap
 
 lines, lineinfo, lineadr, labels, empty = [], [], [], {}, []
 LINEINFO_NONE, LINEINFO_ORG, LINEINFO_BEGIN, LINEINFO_END	= 0x00000, 0x10000, 0x20000, 0x40000
+DEBUG = False
 
 
 if len(sys.argv) < 2: print('USAGE: asm.py <sourcefile> [-s[<tag>]]'); exit(1)
@@ -40,23 +41,6 @@ for i in range(len(lines)):                         # PASS 1: do PER LINE replac
 
     if (lines[i].find(';') != -1): lines[i] = lines[i][0:lines[i].find(';')]    # delete comments
     lines[i] = lines[i].replace(',', ' ')                                       # replace commas with spaces
-
-    """
-    # if there are special lines for formatting etc
-    lineinfo.append(LINEINFO_NONE)                  # generate a separate lineinfo
-    if lines[i].find('#begin') != -1:
-        lineinfo[i] |= LINEINFO_BEGIN
-        lines[i] = lines[i].replace('#begin', '')
-    if lines[i].find('#end') != -1:
-        lineinfo[i] |= LINEINFO_END
-        lines[i] = lines[i].replace('#end', '')
-    k = lines[i].find('#org')
-    if (k != -1):        
-        s = lines[i][k:].split(); rest = ""         # split from #org onwards
-        lineinfo[i] |= LINEINFO_ORG + int(s[1], 0)  # use element after #org as origin address
-        for el in s[2:]: rest += " " + el
-        lines[i] = (lines[i][0:k] + rest).strip()   # join everything before and after the #org ... statement
-    """
 
     if lines[i].find(':') != -1:
         labels[lines[i][:lines[i].find(':')]] = i   # put label with it's line number into dictionary
@@ -87,10 +71,11 @@ for i in empty:
        if labels[key] > i:
            labels[key] = labels[key] - 1
    
-
-#print(lines)
-#print(lineinfo)
-#print(labels)
+if DEBUG :
+    print("Lines, lineinfo and labels before line parsing")
+    print(lines)
+    print(lineinfo)
+    print(labels)
 ########################### catering to specific intructions ###########################################
 for i in range(len(lines)):
     opcode = lines[i][0]
@@ -149,16 +134,7 @@ for i in range(len(lines)):
                 else:
                     relativeLineAdress = relativeLineAdress + 4
                 linechecker = linechecker + 1
-        #print(relativeLineAdress)
-        """
-        if relativeLineAdress > 0:
-            imm = "{:013b}".format(abs(relativeLineAdress) & 0b1111111111111)
-        elif relativeLineAdress == 0:
-            imm ="0000000000000"
-        else:
-            imm = bin(relativeLineAdress & 0b1111111111111)
-            imm = imm[2:]
-        """
+
         imm = "{:013b}".format(int(relativeLineAdress) & 0b1111111111111)
         rs1 = "{:05b}".format(int(lines[i][1]))
         rs2 = "{:05b}".format(int(lines[i][2]))
@@ -190,7 +166,7 @@ for i in range(len(lines)):
         else:
             Exception("unrecognized compressed instruction arount line " + str(i))   
     
-    elif opcode == "01": #compressed addi,sub,and, li,,lui,or,xor
+    elif opcode == "01": #compressed addi,sub,and, li,lui,or,xor
         if lineinfo[i] in ["c.addi","c.li", "c.lui"]:
             rd = "{:05b}".format(int(lines[i][1]))
             funct = constants.memonicToFunct[lineinfo[i]]
@@ -238,7 +214,7 @@ for i in range(len(lines)):
         raise Exception( lineinfo[i] + " around line " + str(i+1) +" cannot be parsed either something is wrong or the command is not yet implemented")    
     
     ### concatenating the instruction into one sting ###
-    print(lines[i])
+    if (DEBUG) : print(lines[i])
     
     lines[i].reverse()
     concat_string = ""
@@ -256,7 +232,10 @@ for i in range(len(lines)):
 with open('output.mem', 'w') as f:
     for line in lines:
         f.writelines(line)
+if DEBUG:
+    print("Lines, lineinfo and labels after being worked on")
+    print(lines)
+    print(lineinfo)
+    print(labels)
 
-print(lines)
-print(lineinfo)
-print(labels)
+print("Assebled instruction successfully into output.mem")
