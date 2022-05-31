@@ -1,12 +1,12 @@
     lw 1, 0, 0                ; loop counter
     addi 2, 0, 7              ; loop limit
-    addi 3, 0, 1              ; fibonacci no. 1
-    addi 4, 0, 1              ; fibonacci no. 2
+    addi 8, 0, 1              ; fibonacci no. 1
+    addi 9, 0, 1              ; fibonacci no. 2
 LOOP:
     c.addi 1, 1              ; counter++
     beq 2, 1, DONE            ; if counter == loop limit then done!
-    c.add  3, 4              ; fib no. 1 = fib no. 1 + fib no. 2
-    c.add 4, 3              ; fib no. 2 = fib no. 1 + fib no. 2
+    c.add  8, 9              ; fib no. 1 = fib no. 1 + fib no. 2
+    c.add 9, 8              ; fib no. 2 = fib no. 1 + fib no. 2
     beq 0, 0, LOOP            ; Jump back and repeat
 DONE:
     sw 0, 3, 0                ; Mem[0] = fib no. 1
