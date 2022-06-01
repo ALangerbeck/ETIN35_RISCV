@@ -116,7 +116,6 @@ begin
     reg_block_two_next.data_two <= data_two;
     reg_block_two_next.immediate <= immediate;
     reg_block_three_next.rd <= reg_block_two_out.rd;
-    reg_block_three_next.data_two <= reg_block_two_out.data_two;
     reg_block_three_next.write_mem_enable <= reg_block_two_out.write_mem_enable;
     reg_block_three_next.write_back_enable <= reg_block_two_out.write_back_enable;
     reg_block_three_next.mux_control_result <= reg_block_two_out.mux_control_result;
@@ -238,7 +237,7 @@ begin
     begin 
         reg_block_two_next.write_back_enable <= '0';
         reg_block_two_next.mux_control_result <= '0'; --- means ALU_result ( exe or mem)
-        if((op_code = R_FORMAT or op_code = L_FORMAT or op_code = I_FORMAT) and block_wb = '0') then
+        if((op_code = R_FORMAT or op_code = L_FORMAT or op_code = I_FORMAT or op_code = U_FORMAT) and block_wb = '0') then
             reg_block_two_next.write_back_enable <= '1';
         end if; 
         if(op_code = L_FORMAT) then 
@@ -274,6 +273,7 @@ begin
     begin
         operand_one <= reg_block_two_out.data_one;
         operand_two <= reg_block_two_out.data_two;
+        reg_block_three_next.data_two <= reg_block_two_out.data_two;
         if(reg_block_two_out.mux_ex_one = FORWARD_NONE) then
             operand_one <= reg_block_two_out.data_one;
         elsif(reg_block_two_out.mux_ex_one = FORWARD_EX_MEM) then
@@ -284,8 +284,10 @@ begin
         if(reg_block_two_out.mux_ex_two = FORWARD_NONE) then
             operand_two <= reg_block_two_out.data_two;
         elsif(reg_block_two_out.mux_ex_two = FORWARD_EX_MEM) then
+            reg_block_three_next.data_two <= reg_block_three_out.result;
             operand_two <= reg_block_three_out.result;
         elsif(reg_block_two_out.mux_ex_two = FORWARD_MEM_WB) then
+            reg_block_three_next.data_two <= wb_result;
             operand_two <= wb_result;
         end if;
     end process;

@@ -266,9 +266,6 @@ begin
             imm_gen_in <= instruction.funct7 & instruction.rd;
         elsif(instruction.opcode = B_FORMAT) then 
             imm_gen_in <= instruction.funct7(6) & instruction.rd(0) & instruction.funct7(5 downto 0) & instruction.rd(4 downto 1);
-        elsif(instruction.opcode = U_FORMAT) then 
-            imm_gen_in <= (others => '0');
-        else 
             if(instruction.opcode = U_FORMAT) then 
                 immediate_out <= instruction.funct7 & instruction.rs2 & instruction.rs1 & instruction.funct3 & "000000000000";
             end if;
