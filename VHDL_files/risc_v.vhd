@@ -152,7 +152,7 @@ begin
         mux_control_pc <= '0';
         if_flush <= '0';
         if(op_code = B_FORMAT) then 
-            if((funct3 = "000" and comp_equal ='1') or( funct3 ="001" and comp_equal = '0')or( funct3 ="100" and comp = '1') or( funct3 ="101" and comp_equal = '1')or( funct3 ="110" and (comp_equal = '1' or comp_u = '1'))or( funct3 ="111" and (comp_equal = '0' and comp_u = '0'))) then 
+            if((funct3 = "000" and comp_equal ='1') or( funct3 ="001" and comp_equal = '0')or( funct3 ="100" and comp = '1') or( funct3 ="101" and comp = '0')or( funct3 ="110" and (comp_equal = '1' or comp_u = '1'))or( funct3 ="111" and (comp_equal = '0' and comp_u = '0'))) then 
                 mux_control_pc <= '1';
                 if_flush <= '1';
             end if;
