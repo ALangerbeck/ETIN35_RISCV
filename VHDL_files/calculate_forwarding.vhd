@@ -30,12 +30,12 @@ begin
     stall <= '0';
     stall_load <= '0';
     stall_branch <= '0';
-    if(opcode = B_FORMAT) then
+    if(opcode = B_FORMAT) then --For branch insert stall since no forward possible
         if((rs=rd_ex and rd_ex/="00000") or(rs=rd_mem and rd_mem/="00000")) then
             stall_branch <= '1';
         end if;
     end if;
-    if(lw_ex = '1' and rs=rd_ex and rd_ex/="00000") then
+    if(lw_ex = '1' and rs=rd_ex and rd_ex/="00000") then --Stall until lw has loaded word
         stall_load <= '1';
     end if;
     if(stall_load = '1' or stall_branch = '1') then
@@ -53,7 +53,7 @@ begin
             ex_mux <= "10";
         end if;
         
-        if(rs = rd_wb) then 
+        if(rs = rd_wb) then -- forwardning since we can't write the same cycle as we read
             id_mux <= '1';
         end if;
     end process; 

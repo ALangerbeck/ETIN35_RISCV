@@ -145,7 +145,7 @@ begin
         end if; 
     end process;
     
-    branch_control : process(comp_equal, comp, op_code, funct3) --only compatiable with beq so far
+    branch_control : process(comp_equal, comp, op_code, funct3)
     begin 
         mux_control_pc <= '0';
         if_flush <= '0';
@@ -234,22 +234,22 @@ begin
     write_back_control : process(op_code, block_wb)
     begin 
         reg_block_two_next.write_back_enable <= '0';
-        reg_block_two_next.mux_control_result <= '0'; --- means ALU_result
+        reg_block_two_next.mux_control_result <= '0'; --- means ALU_result ( exe or mem)
         if((op_code = R_FORMAT or op_code = L_FORMAT or op_code = I_FORMAT) and block_wb = '0') then
             reg_block_two_next.write_back_enable <= '1';
         end if; 
         if(op_code = L_FORMAT) then 
-            reg_block_two_next.mux_control_result <= '1';
+            reg_block_two_next.mux_control_result <= '1'; -- means wb from mem stage
         end if; 
     end process;
     
     write_back : process(reg_block_four_out.mux_control_result, reg_block_four_out.ALU_result, reg_block_four_out.read_data)
     begin 
         if(reg_block_four_out.mux_control_result = '0') then 
-            data_write <= reg_block_four_out.ALU_result; --for redundancy
+            data_write <= reg_block_four_out.ALU_result; --for redundancy so that vivado don't optimize away the design
             wb_result <= reg_block_four_out.ALU_result;
         else 
-            data_write <= reg_block_four_out.read_data; --for redundancy
+            data_write <= reg_block_four_out.read_data; --for redundancy so that vivado don't optimize away the design
             wb_result <= reg_block_four_out.read_data;
         end if;
     end process;
