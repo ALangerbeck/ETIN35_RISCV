@@ -116,6 +116,7 @@ begin
     reg_block_two_next.data_two <= data_two;
     reg_block_two_next.immediate <= immediate;
     reg_block_three_next.rd <= reg_block_two_out.rd;
+    reg_block_three_next.data_two <= reg_block_two_out.data_two;
     reg_block_three_next.write_mem_enable <= reg_block_two_out.write_mem_enable;
     reg_block_three_next.write_back_enable <= reg_block_two_out.write_back_enable;
     reg_block_three_next.mux_control_result <= reg_block_two_out.mux_control_result;
@@ -147,12 +148,12 @@ begin
         end if; 
     end process;
     
-    branch_control : process(comp_equal, comp, op_code, funct3)
+    branch_control : process(comp_equal, comp, comp_u, op_code, funct3)
     begin 
         mux_control_pc <= '0';
         if_flush <= '0';
         if(op_code = B_FORMAT) then 
-            if((funct3 = "000" and comp_equal ='1') or( funct3 ="001" and comp_equal = '0')or( funct3 ="100" and comp = '1') or( funct3 ="101" and comp = '0')or( funct3 ="110" and (comp_equal = '1' or comp_u = '1'))or( funct3 ="111" and (comp_equal = '0' and comp_u = '0'))) then 
+            if((funct3 = "000" and comp_equal ='1') or( funct3 ="001" and comp_equal = '0')or( funct3 ="100" and comp = '1') or( funct3 ="101" and comp = '0')or( funct3 ="110" and (comp_equal = '1' or comp_u = '1'))or( funct3 ="111" and (comp_u = '0'))) then 
                 mux_control_pc <= '1';
                 if_flush <= '1';
             end if;
@@ -237,7 +238,7 @@ begin
     begin 
         reg_block_two_next.write_back_enable <= '0';
         reg_block_two_next.mux_control_result <= '0'; --- means ALU_result ( exe or mem)
-        if((op_code = R_FORMAT or op_code = L_FORMAT or op_code = I_FORMAT or op_code = U_FORMAT) and block_wb = '0') then
+        if((op_code = R_FORMAT or op_code = L_FORMAT or op_code = I_FORMAT) and block_wb = '0') then
             reg_block_two_next.write_back_enable <= '1';
         end if; 
         if(op_code = L_FORMAT) then 
@@ -273,7 +274,6 @@ begin
     begin
         operand_one <= reg_block_two_out.data_one;
         operand_two <= reg_block_two_out.data_two;
-        reg_block_three_next.data_two <= reg_block_two_out.data_two;
         if(reg_block_two_out.mux_ex_one = FORWARD_NONE) then
             operand_one <= reg_block_two_out.data_one;
         elsif(reg_block_two_out.mux_ex_one = FORWARD_EX_MEM) then
@@ -284,10 +284,8 @@ begin
         if(reg_block_two_out.mux_ex_two = FORWARD_NONE) then
             operand_two <= reg_block_two_out.data_two;
         elsif(reg_block_two_out.mux_ex_two = FORWARD_EX_MEM) then
-            reg_block_three_next.data_two <= reg_block_three_out.result;
             operand_two <= reg_block_three_out.result;
         elsif(reg_block_two_out.mux_ex_two = FORWARD_MEM_WB) then
-            reg_block_three_next.data_two <= wb_result;
             operand_two <= wb_result;
         end if;
     end process;

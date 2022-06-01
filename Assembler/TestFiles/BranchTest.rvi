@@ -20,7 +20,7 @@ TEST6:
     bge 1 1 Test6Right
     beq 0 0 Test6Wrong
 TEST7:
-    bltu 4 5 Test7Wrong
+    bltu 4 2 Test7Wrong
     bltu 2 1 Test7Right
 TEST8:
     bgeu 2 1 Test8Wrong
@@ -77,10 +77,10 @@ Test8Wrong:
     beq 0 0 TEST9
 Test9Right:
     addi 12 0 2
-    bne 0 0 TEST10
+    beq 0 0 TEST10
 Test9Wrong:
     addi 12 0 1
-    bne 0 0 TEST10
+    beq 0 0 TEST10
 DONE:
     add 0 0 0
     add 0 0 0
