@@ -10,6 +10,9 @@ entity calculate_forwarding is
             rd_ex : in std_logic_vector(4 downto 0);
             rd_mem : in std_logic_vector(4 downto 0);
             rd_wb : in std_logic_vector(4 downto 0);
+            ex_wb_enable :in std_logic;
+            mem_wb_enable : in std_logic;
+            wb_wb_enable : in std_logic;
             lw_ex : in std_logic;
             opcode : in std_logic_vector(6 downto 0);
             ex_mux : out std_logic_vector(1 downto 0);
@@ -24,7 +27,7 @@ signal stall_branch, stall_load : std_logic;
 
 
 begin
-    
+    -- maybe should fix hazard detection so it checks wb enable as well. 
     calc_hazard_detection : process(opcode, rs, rd_ex, rd_mem, lw_ex, stall_load, stall_branch)
     begin
     stall <= '0';
@@ -43,17 +46,17 @@ begin
     end if;
     end process;
     
-    calc_forwarding : process(rs, rd_ex, rd_mem, rd_wb) 
+    calc_forwarding : process(rs, rd_ex, rd_mem, rd_wb, ex_wb_enable, mem_wb_enable, wb_wb_enable) 
     begin 
         ex_mux <= "00";
         id_mux <= '0';
-        if(rs = rd_ex) then
+        if(rs = rd_ex and ex_wb_enable = '1') then
             ex_mux <= "01";
-        elsif ( rs=rd_mem ) then 
+        elsif ( rs=rd_mem and mem_wb_enable = '1') then 
             ex_mux <= "10";
         end if;
-        
-        if(rs = rd_wb) then -- forwardning since we can't write the same cycle as we read
+
+        if(rs = rd_wb and wb_wb_enable = '1') then -- forwardning since we can't write the same cycle as we read
             id_mux <= '1';
         end if;
     end process; 
