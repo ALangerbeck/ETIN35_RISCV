@@ -148,7 +148,13 @@ for i in range(len(lines)):
         rs1p = "{:03b}".format(int(lines[i][1]))
         rs2p = "{:03b}".format(int(lines[i][2]))
         uimm = "{:07b}".format(int(lines[i][3]))
-        lines[i] = [opcode,rs2p,uimm[4]+uimm[0],rs1p,uimm[1:4],funct]
+        if lineinfo[i] == "c.sw":
+            r1 = rs2p
+            r2 = rs1p
+        elif lineinfo[i] == "c.lw":
+            r1 = rs1p
+            r2 = rs1p
+        lines[i] = [opcode,r1,uimm[4]+uimm[0],r2,uimm[1:4],funct]
     
     elif opcode == "10": #compressed add,
         rd = "{:05b}".format(int(lines[i][1]))
