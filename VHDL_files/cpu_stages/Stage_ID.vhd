@@ -110,7 +110,7 @@ begin
     
     end process;
     
-    load_upper_immediate : process(instruction.opcode)
+    load_upper_immediate : process(instruction)
     begin 
         rs1_temp <= instruction_in(19 downto 15);
         if(instruction.opcode = U_FORMAT) then 

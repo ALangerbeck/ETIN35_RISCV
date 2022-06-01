@@ -34,7 +34,7 @@ begin
     stall_load <= '0';
     stall_branch <= '0';
     if(opcode = B_FORMAT) then --For branch insert stall since no forward possible
-        if((rs=rd_ex and rd_ex/="00000") or(rs=rd_mem and rd_mem/="00000")) then
+        if((rs=rd_ex and rd_ex/="00000" and ex_wb_enable = '1') or(rs=rd_mem and rd_mem/="00000" and mem_wb_enable = '1')) then
             stall_branch <= '1';
         end if;
     end if;

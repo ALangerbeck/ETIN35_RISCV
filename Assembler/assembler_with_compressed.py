@@ -15,7 +15,7 @@ from textwrap import wrap
 
 lines, lineinfo, lineadr, labels, empty = [], [], [], {}, []
 LINEINFO_NONE, LINEINFO_ORG, LINEINFO_BEGIN, LINEINFO_END	= 0x00000, 0x10000, 0x20000, 0x40000
-DEBUG = False
+DEBUG = True
 
 
 if len(sys.argv) < 2: print('USAGE: asm.py <sourcefile> [-s[<tag>]]'); exit(1)
