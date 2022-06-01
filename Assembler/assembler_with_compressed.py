@@ -15,7 +15,7 @@ from textwrap import wrap
 
 lines, lineinfo, lineadr, labels, empty = [], [], [], {}, []
 LINEINFO_NONE, LINEINFO_ORG, LINEINFO_BEGIN, LINEINFO_END	= 0x00000, 0x10000, 0x20000, 0x40000
-DEBUG = True
+DEBUG = False
 
 
 if len(sys.argv) < 2: print('USAGE: asm.py <sourcefile> [-s[<tag>]]'); exit(1)
@@ -63,19 +63,27 @@ for i in range(len(lines)):                         # PASS 1: do PER LINE replac
 
         
 ## delete empty lines  and adjusting labels##
+if DEBUG:
+    print("labels before: ",end="")
+    print(labels)
+    print("Empty: ",end="")
+    print(empty)
+labelsNew = labels.copy()
 iter = 0
 for i in empty:
    del lines[i - iter]
    iter = iter + 1
    for key in labels:
        if labels[key] > i:
-           labels[key] = labels[key] - 1
-   
+           labelsNew[key] = labelsNew[key] - 1
+labels = labelsNew.copy()
 if DEBUG :
     print("Lines, lineinfo and labels before line parsing")
     print(lines)
     print(lineinfo)
     print(labels)
+    print("nbr of lines: ",end="")
+    print(len(lines))
 ########################### catering to specific intructions ###########################################
 for i in range(len(lines)):
     opcode = lines[i][0]
@@ -122,6 +130,9 @@ for i in range(len(lines)):
         relativeLineAdress = 0;
         linechecker = i;
         while linechecker != labels[label]:
+            #print(linechecker,end = "")
+            #print(" : ",end="")
+            #print(lineinfo[linechecker])
             if lineDist > 0:
                 if lineinfo[linechecker - 1][0] == 'c':
                     relativeLineAdress = relativeLineAdress - 2

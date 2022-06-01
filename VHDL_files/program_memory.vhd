@@ -17,6 +17,7 @@ end program_memory;
 
 architecture behavioral of program_memory is
 
+
     constant MEMORY_DEPTH: natural := 2 ** PROGRAM_ADDRESS_WIDTH;
     
     

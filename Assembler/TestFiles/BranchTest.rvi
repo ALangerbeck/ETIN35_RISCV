@@ -1,0 +1,50 @@
+    addi 1 0 10
+    addi 2 0 5
+    addi 3 0 -5
+TEST1:
+    bne 1 1 Test1WRONG
+    bne 1 2 Test1RIGHT
+TEST2:
+    bne 1 3 Test2Wrong
+TEST3:
+    blt 1 2 Test3Wrong
+    blt 10 3 Test3Wrong
+    blt 3 2 Test3Right
+TEST5:
+    bge 2 1 Test5Wrong
+    bge 3 1 Test5Wrong
+    bge 1 3 Test5Right
+TEST6:
+    bge 1 1 Test6Right
+    beq 0 0 Test6Wrong
+TEST7:
+    beq 0 0 DONE
+Test1WRONG:
+    addi 5 0 1
+    beq 0 0 TEST2
+Test1RIGHT: 
+    addi 5 0 2
+    beq 0 0 TEST2
+Test2Wrong:
+    addi 6 0 1
+    beq 0 0 TEST3
+Test3Wrong:
+    addi 7 0 1
+    beq 0 0 TEST5
+Test3Right:
+    addi 7 0 2
+    beq 0 0 TEST5
+Test5Wrong:
+    addi 8 0 1
+    beq 0 0 TEST6
+Test5Right:
+    addi 8 0 2
+    beq 0 0 TEST6
+Test6Right:
+    addi 9 0 2
+    beq 0 0 TEST7
+Test6Wrong:
+    addi 9 0 1
+    beq 0 0 TEST7
+DONE:
+    add 0 0 0
