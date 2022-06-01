@@ -142,6 +142,13 @@ for i in range(len(lines)):
         imm3125 = imm[0] + (imm[2:8])
         funct = constants.memonicToFunct[lineinfo[i]]
         lines[i] = [opcode,imm117,funct,rs1,rs2,imm3125]
+    ### U-type ###
+    elif opcode == "0110111":
+        if(len(lines[i]) != 3 ):
+            raise Exception("Expecting 2 arguments for " + lineinfo[i] + " around line " + str(i+1))
+        rd = "{:05b}".format(int(lines[i][1]))
+        imm = "{:032b}".format(int(lines[i][2]) & 0b11111111111111111111111111111111)
+        lines[i] = [opcode,rd,imm[0:20]]
     ### compressed ###
     elif opcode == "00": #compressed sw & lw 
         funct = memonicToFunct[lineinfo[i]]
