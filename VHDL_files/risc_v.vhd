@@ -166,7 +166,7 @@ begin
         reg_block_two_next.ALU_control <= "0000";
         block_wb <= '0';
         -- add
-        if((funct3 = "000" and(op_code = I_FORMAT or (op_code = R_FORMAT and funct7 = "0000000"))) or op_code= S_FORMAT or op_code = L_FORMAT) then 
+        if((funct3 = "000" and(op_code = I_FORMAT or (op_code = R_FORMAT and funct7 = "0000000"))) or op_code= S_FORMAT or op_code = L_FORMAT or op_code = U_FORMAT) then 
             reg_block_two_next.ALU_control <= "0010";
         -- sub
         elsif(funct3 = "000" and op_code = R_FORMAT and funct7 = "0100000") then

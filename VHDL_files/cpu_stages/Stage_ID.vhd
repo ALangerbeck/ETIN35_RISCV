@@ -54,6 +54,7 @@ signal imm_gen_out_c : std_logic_vector(11 downto 0);
 signal imm_gen_shifted, pc_temp_calc  : std_logic_vector(12 downto 0);
 signal debug_instruction_type : instruction_type_debug;
 
+signal rs1_temp : std_logic_vector(4 downto 0); 
 signal opcode_c : std_logic_vector(6 downto 0);
 signal rd_c : std_logic_vector(4 downto 0);
 signal funct3_c : std_logic_vector(2 downto 0);
@@ -78,7 +79,7 @@ begin
     instruction_ordi <= (  opcode  => instruction_in(6 downto 0),
                   rd => instruction_in(11 downto 7),
                   funct3 => instruction_in(14 downto 12),
-                  rs1 => instruction_in(19 downto 15),
+                  rs1 => rs1_temp,
                   rs2 => instruction_in(24 downto 20),
                   funct7=> instruction_in(31 downto 25));
                       
@@ -107,6 +108,14 @@ begin
             instruction <= instruction_ordi;
          end if;
     
+    end process;
+    
+    load_upper_immediate : process(instruction.opcode)
+    begin 
+        rs1_temp <= instruction_in(19 downto 15);
+        if(instruction.opcode = U_FORMAT) then 
+            rs1_temp <= "00000";
+        end if;
     end process;
     
     sign_extend_compressed : process(instruction_in)
@@ -246,6 +255,7 @@ begin
             funct7_c <= NOP(31 downto 25);
         end if; 
     end process;
+    
     
     immediate_genarator : process(instruction.opcode,imm_gen_out, instruction.opcode, imm_gen_out, instruction.funct7,instruction.rs2,instruction.rd) --only implemented to check a few opcodes, might need to be extended. 
     begin
