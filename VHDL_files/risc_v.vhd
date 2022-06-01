@@ -100,6 +100,9 @@ component calculate_forwarding is
         rd_ex : in std_logic_vector(4 downto 0);
         rd_mem : in std_logic_vector(4 downto 0);
         rd_wb : in std_logic_vector(4 downto 0);
+        ex_wb_enable :in std_logic;
+        mem_wb_enable : in std_logic;
+        wb_wb_enable : in std_logic;
         lw_ex : in std_logic;
         opcode : in std_logic_vector(6 downto 0);
         ex_mux : out std_logic_vector(1 downto 0);
@@ -364,6 +367,9 @@ begin
         rd_ex => reg_block_two_out.rd,
         rd_mem  => reg_block_three_out.rd,
         rd_wb  => reg_block_four_out.rd,
+        ex_wb_enable => reg_block_two_out.write_back_enable,
+        mem_wb_enable => reg_block_three_out.write_back_enable,
+        wb_wb_enable => reg_block_four_out.write_back_enable,
         opcode => op_code,
         lw_ex => reg_block_two_out.lw,
         ex_mux => reg_block_two_next.mux_ex_one, 
@@ -377,6 +383,9 @@ begin
         rd_ex => reg_block_two_out.rd,
         rd_mem  => reg_block_three_out.rd,
         rd_wb  => reg_block_four_out.rd,
+        ex_wb_enable => reg_block_two_out.write_back_enable,
+        mem_wb_enable => reg_block_three_out.write_back_enable,
+        wb_wb_enable => reg_block_four_out.write_back_enable,
         opcode => op_code,
         lw_ex => reg_block_two_out.lw,
         ex_mux => reg_block_two_next.mux_ex_two, 
