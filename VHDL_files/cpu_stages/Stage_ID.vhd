@@ -246,6 +246,13 @@ begin
             rs1_c <= ( "00" & instruction_in(9 downto 7))+8;
             rs2_c <= instruction_in(6 downto 2);
             funct7_c <= "000000" & instruction_in(12);
+        elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "011") then
+            opcode_c <= "0110111";
+            rd_c <= instruction_in(11 downto 7);
+            funct3_c <= instruction_in(4 downto 2);
+            rs1_c <= "00" & instruction_in(12) & instruction_in(6 downto 5);
+            rs2_c <= "00000";
+            funct7_c <= "0000000";
         else -- if no op_code fits we import a nop instruction. - has in instruction manual same format as addi, but here I just expand it to the Nop instruction in the common file. 
             opcode_c <= NOP(6 downto 0);
             rd_c <= NOP(11 downto 7);

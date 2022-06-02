@@ -1,0 +1,29 @@
+    addi 2, 0, 20              ; loop limit
+    sw 0, 1, 0
+INIT:
+    beq 2, 1, DONE
+    addi 1, 1, 1            ; counter++
+    sw 1, 1, 0
+    beq 0,0, INIT
+DONE:
+    lw 3, 0, 15             ; start of arithmetic test
+    sub 4, 0, 3
+    lui 5, 1048576
+    lw 6, 0, 19
+    xor 7, 4, 6
+    xori 8, 6, 1950
+    or 9, 4, 6
+    ori 10, 6, 1950
+    and 11, 4, 6
+    andi 12, 4, 1950
+    slt 13, 8, 4
+    slt 14, 4, 6
+    slti 15, 8, 1950
+    sltu 16, 8, 4
+    sltiu 17, 3, -2
+    add 0, 0, 0              ; NOPs ...
+    add 0, 0, 0
+    add 0, 0, 0
+    add 0, 0, 0
+    add 0, 0, 0
+    add 0, 0, 0
