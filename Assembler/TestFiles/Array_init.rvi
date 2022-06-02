@@ -16,11 +16,18 @@ DONE:
     ori 10, 6, 1950
     and 11, 4, 6
     andi 12, 4, 1950
-    slt 13, 8, 4
+    slt 13, 8, 4            ; start of compare test
     slt 14, 4, 6
     slti 15, 8, 1950
     sltu 16, 8, 4
     sltiu 17, 3, -2
+    lw 18, 0, 4
+    sll 19, 3, 18
+    slli 20, 3, 2
+    srl 21, 3, 18
+    srli 22, 4, 2
+    sra 23, 3, 18
+    srai 24, 4, 2
     add 0, 0, 0              ; NOPs ...
     add 0, 0, 0
     add 0, 0, 0

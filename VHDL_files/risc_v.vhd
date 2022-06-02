@@ -116,7 +116,6 @@ begin
     reg_block_two_next.data_two <= data_two;
     reg_block_two_next.immediate <= immediate;
     reg_block_three_next.rd <= reg_block_two_out.rd;
-    reg_block_three_next.data_two <= reg_block_two_out.data_two;
     reg_block_three_next.write_mem_enable <= reg_block_two_out.write_mem_enable;
     reg_block_three_next.write_back_enable <= reg_block_two_out.write_back_enable;
     reg_block_three_next.mux_control_result <= reg_block_two_out.mux_control_result;
@@ -274,6 +273,7 @@ begin
     begin
         operand_one <= reg_block_two_out.data_one;
         operand_two <= reg_block_two_out.data_two;
+        reg_block_three_next.data_two <= reg_block_two_out.data_two;
         if(reg_block_two_out.mux_ex_one = FORWARD_NONE) then
             operand_one <= reg_block_two_out.data_one;
         elsif(reg_block_two_out.mux_ex_one = FORWARD_EX_MEM) then
@@ -285,8 +285,10 @@ begin
             operand_two <= reg_block_two_out.data_two;
         elsif(reg_block_two_out.mux_ex_two = FORWARD_EX_MEM) then
             operand_two <= reg_block_three_out.result;
+            reg_block_three_next.data_two <= reg_block_three_out.result;
         elsif(reg_block_two_out.mux_ex_two = FORWARD_MEM_WB) then
             operand_two <= wb_result;
+            reg_block_three_next.data_two <= wb_result;
         end if;
     end process;
     
