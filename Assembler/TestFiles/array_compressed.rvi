@@ -17,7 +17,7 @@ DONE:
     c.andi 3, 29
     lw 14, 0, 19
     c.mv 15, 8
-    c.mv 16, 8
+    c.mv 13, 8
     c.slli 14, 5
     c.srai 7, 5
     c.srli 5, 5 
