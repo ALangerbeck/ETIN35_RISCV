@@ -20,7 +20,7 @@ DONE:
     c.mv 16, 8
     c.slli 14, 5
     c.srai 7, 5
-    c.srli 8, 5 
+    c.srli 5, 5 
     add 0, 0, 0              ; NOPs ...
     add 0, 0, 0
     add 0, 0, 0

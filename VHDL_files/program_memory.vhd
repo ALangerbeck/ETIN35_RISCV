@@ -19,8 +19,6 @@ architecture behavioral of program_memory is
 
     constant MEMORY_DEPTH: natural := 2 ** PROGRAM_ADDRESS_WIDTH;
     
-    
-    
     type ram_type is array (0 to 4*MEMORY_DEPTH-1) of std_logic_vector(DATA_WIDTH/4-1 downto 0);
     
     impure function initRAM(filename: in string) return ram_type is
