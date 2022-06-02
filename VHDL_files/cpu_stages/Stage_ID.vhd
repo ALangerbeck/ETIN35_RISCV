@@ -190,7 +190,7 @@ begin
             rs1_c <= ( "00" & instruction_in(9 downto 7))+8;
             rs2_c <= imm_gen_out_c(4 downto 0);
             funct7_c <= imm_gen_out_c(11 downto 5);
-            --c.or 
+            --c.or
         elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 10) = "100011" and instruction_in(6 downto 5)="10") then 
             opcode_c <= "0110011";
             rd_c <= ( "00" & instruction_in(9 downto 7))+8;
@@ -198,7 +198,7 @@ begin
             rs1_c <= ( "00" & instruction_in(9 downto 7))+8;
             rs2_c <= ( "00" & instruction_in(4 downto 2))+8;
             funct7_c <= "0000000";
-            --c.or 
+            --c.xor
         elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 10) = "100011" and instruction_in(6 downto 5)="01") then 
             opcode_c <= "0110011";
             rd_c <= ( "00" & instruction_in(9 downto 7))+8;

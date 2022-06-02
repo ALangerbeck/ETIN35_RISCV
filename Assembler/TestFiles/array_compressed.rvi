@@ -12,7 +12,7 @@ DONE:
     c.mv 12, 8
     c.li 11,15
     c.xor 3, 0
-    c.or 12, 2
+    c.or 4, 2
     c.and 1, 2
     c.andi 3, 29
     lw 14, 0, 19
