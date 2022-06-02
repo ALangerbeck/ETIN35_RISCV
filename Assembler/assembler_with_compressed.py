@@ -258,7 +258,8 @@ for i in range(len(lines)):
     print(len(lines[i]))
 
     if((len(lines[i]) != 32) and (len(lines[i]) != 16)):
-        raise Exception("Line " + str(i) + " is the wrong number of bits")    
+        
+        raise Exception("Line " + str(i) + " is the wrong number of bits, nbr: " +str(len(lines[i])))    
     
     lines[i] = wrap(lines[i],8)
     lines[i].reverse()
