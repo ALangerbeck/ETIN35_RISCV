@@ -284,7 +284,7 @@ begin
     pc_branch : process(imm_gen_out, pc_in,imm_gen_shifted, pc_temp_calc)
     begin 
         imm_gen_shifted <= imm_gen_out(11 downto 0) & '0'; --unsure if this is the correct left shift one that they want us to do. Double check later. 
-        pc_temp_calc <= imm_gen_shifted + ("000000" & pc_in);
+        pc_temp_calc <= imm_gen_shifted + ("00000" & pc_in);
         pc_branch_out <= pc_temp_calc(PROGRAM_ADDRESS_WIDTH-1 downto 0);
     end process;
 
