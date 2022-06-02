@@ -95,9 +95,9 @@ for i in range(len(lines)):
         funct = constants.memonicToFunct[lineinfo[i]]
         rs1 = "{:05b}".format(int(lines[i][2]))
         if lineinfo[i] in ["slli","srli","srai"]:
-            shamt = "{:05}".format(int(lines[i][3]))
+            shamt = "{:05b}".format(int(lines[i][3]))
             imm = constants.memonicToImm[lineinfo[i]]
-            lines[i] = [opcode,rd,funct,shamt,imm]
+            lines[i] = [opcode,rd,funct,rs1,shamt,imm]
         else: 
             imm ="{:012b}".format(int(lines[i][3]) & 0b111111111111)
             lines[i] = [opcode,rd,funct,rs1,imm]
@@ -217,7 +217,7 @@ for i in range(len(lines)):
                 funct = "11"
                 funct2 = "100011"
             elif lineinfo[i] == "c.or":
-                funct = "00"
+                funct = "10"
                 funct2= "100011"
             elif lineinfo[i] == "c.xor":
                 funct = "01"
