@@ -24,9 +24,9 @@ DONE:
     lw 18, 0, 4
     sll 19, 3, 18
     slli 20, 3, 2
-    srl 21, 3, 18
+    srl 21, 4, 18
     srli 22, 4, 2
-    sra 23, 3, 18
+    sra 23, 4, 18
     srai 24, 4, 2
     add 0, 0, 0              ; NOPs ...
     add 0, 0, 0

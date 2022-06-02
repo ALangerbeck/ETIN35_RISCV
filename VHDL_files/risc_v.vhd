@@ -189,9 +189,8 @@ begin
         elsif(funct3 = "001" and( op_code = I_FORMAT or op_code = R_FORMAT)) then 
             --should we have some kind of error message here that changes the instruction to a NOP if it is wrong somehow, so that it would be easier
             -- to debug wrong instructions. 
-            if(immediate(4) = '0') then 
-                reg_block_two_next.ALU_control <= "0111";
-            else
+            reg_block_two_next.ALU_control <= "0111";
+            if(immediate(4) = '1' and op_code = I_FORMAT) then 
                 block_wb <= '1';
             end if;
         -- right logical or arithmetic shift
@@ -237,7 +236,7 @@ begin
     begin 
         reg_block_two_next.write_back_enable <= '0';
         reg_block_two_next.mux_control_result <= '0'; --- means ALU_result ( exe or mem)
-        if((op_code = R_FORMAT or op_code = L_FORMAT or op_code = I_FORMAT) and block_wb = '0') then
+        if((op_code = R_FORMAT or op_code = L_FORMAT or op_code = I_FORMAT or op_code = U_FORMAT) and block_wb = '0') then
             reg_block_two_next.write_back_enable <= '1';
         end if; 
         if(op_code = L_FORMAT) then 

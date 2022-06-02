@@ -1,0 +1,29 @@
+    addi 2, 0, 20              ; loop limit
+    sw 0, 1, 0
+INIT:
+    beq 2, 1, DONE
+    addi 1, 1, 1            ; counter++
+    sw 1, 1, 0
+    beq 0,0, INIT
+DONE:
+    lw 10, 0, 15             ; compressed test
+    c.sub 0,2
+    c.lui 9, 114688
+    c.mv 12, 8
+    c.li 11,15
+    c.xor 3, 0
+    c.or 12, 2
+    c.and 1, 2
+    c.andi 3, 29
+    lw 14, 0, 19
+    c.mv 15, 8
+    c.mv 16, 8
+    c.slli 14, 5
+    c.srai 15, 5
+    c.srli 16, 5 
+    add 0, 0, 0              ; NOPs ...
+    add 0, 0, 0
+    add 0, 0, 0
+    add 0, 0, 0
+    add 0, 0, 0
+    add 0, 0, 0
