@@ -255,7 +255,6 @@ for i in range(len(lines)):
     for inst in lines[i]:
         concat_string =  concat_string + inst
     lines[i] = concat_string
-    print(len(lines[i]))
 
     if((len(lines[i]) != 32) and (len(lines[i]) != 16)):
         
