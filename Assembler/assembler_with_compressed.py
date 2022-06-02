@@ -94,8 +94,13 @@ for i in range(len(lines)):
         rd = "{:05b}".format(int(lines[i][1]))
         funct = constants.memonicToFunct[lineinfo[i]]
         rs1 = "{:05b}".format(int(lines[i][2]))
-        imm ="{:012b}".format(int(lines[i][3]) & 0b111111111111)
-        lines[i] = [opcode,rd,funct,rs1,imm]
+        if lineinfo[i] in ["slli","srli","srai"]:
+            shamt = "{:05}".format(int(lines[i][3]))
+            imm = constants.memonicToImm[lineinfo[i]]
+            lines[i] = [opcode,rd,funct,shamt,imm]
+        else: 
+            imm ="{:012b}".format(int(lines[i][3]) & 0b111111111111)
+            lines[i] = [opcode,rd,funct,rs1,imm]
     ### Register instructions ###
     elif opcode == '0110011':
         if(len(lines[i]) != 4 ):
