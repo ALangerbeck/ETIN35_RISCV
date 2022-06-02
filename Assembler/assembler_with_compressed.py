@@ -15,7 +15,7 @@ from textwrap import wrap
 
 lines, lineinfo, lineadr, labels, empty = [], [], [], {}, []
 LINEINFO_NONE, LINEINFO_ORG, LINEINFO_BEGIN, LINEINFO_END	= 0x00000, 0x10000, 0x20000, 0x40000
-DEBUG = False
+DEBUG = True
 
 
 if len(sys.argv) < 2: print('USAGE: asm.py <sourcefile> [-s[<tag>]]'); exit(1)
@@ -226,7 +226,7 @@ for i in range(len(lines)):
         
         elif lineinfo[i] in ["c.andi","c.srli","c.srai"]:
             rdp = "{:03b}".format(int(lines[i][1]))
-            imm = "{:06b}".format(int(lines[i][1]))
+            imm = "{:06b}".format(int(lines[i][2]) & 0b111111)
             funct = constants.memonicToFunct[lineinfo[i]]
             if lineinfo[i] == "c.andi":
                 funct2 = "10"
