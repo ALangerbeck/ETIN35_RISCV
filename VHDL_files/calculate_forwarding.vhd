@@ -28,7 +28,7 @@ signal stall_branch, stall_load : std_logic;
 
 begin
     -- maybe should fix hazard detection so it checks wb enable as well. 
-    calc_hazard_detection : process(opcode, rs, rd_ex, rd_mem, lw_ex, stall_load, stall_branch)
+    calc_hazard_detection : process(opcode, rs, rd_ex, rd_mem, lw_ex, stall_load, stall_branch,ex_wb_enable,mem_wb_enable)
     begin
     stall <= '0';
     stall_load <= '0';

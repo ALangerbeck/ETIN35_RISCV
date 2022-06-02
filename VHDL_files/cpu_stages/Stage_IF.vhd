@@ -51,7 +51,7 @@ begin
     pc_out <= pc;
     instruction_out <= instruction;
     
-    program_counter : process(mux_control, pc, pc_branch, stall)
+    program_counter : process(mux_control, pc, pc_branch, stall,instruction)
     begin
         if(stall = '1') then
             pc_next <= pc;
