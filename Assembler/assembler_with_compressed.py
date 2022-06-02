@@ -15,7 +15,7 @@ from textwrap import wrap
 
 lines, lineinfo, lineadr, labels, empty = [], [], [], {}, []
 LINEINFO_NONE, LINEINFO_ORG, LINEINFO_BEGIN, LINEINFO_END	= 0x00000, 0x10000, 0x20000, 0x40000
-DEBUG = True
+DEBUG = False
 
 
 if len(sys.argv) < 2: print('USAGE: asm.py <sourcefile> [-s[<tag>]]'); exit(1)
@@ -226,13 +226,15 @@ for i in range(len(lines)):
         
         elif lineinfo[i] in ["c.andi","c.srli","c.srai"]:
             rdp = "{:03b}".format(int(lines[i][1]))
-            imm = "{:06b}".format(int(lines[i][2]) & 0b111111)
             funct = constants.memonicToFunct[lineinfo[i]]
             if lineinfo[i] == "c.andi":
+                imm = "{:06b}".format(int(lines[i][2]) & 0b111111)
                 funct2 = "10"
             elif lineinfo[i] == "c.srai":
+                imm = "{:06b}".format(int(lines[i][2]))
                 funct2 = "01"
             elif lineinfo[i] == "c.srli":
+                imm = "{:06b}".format(int(lines[i][2]))
                 funct2 = "00"
             lines[i] = [opcode,imm[1:6],rdp,funct2,imm[0],funct]
         
@@ -253,7 +255,10 @@ for i in range(len(lines)):
     for inst in lines[i]:
         concat_string =  concat_string + inst
     lines[i] = concat_string
-    if(len(lines[i]) != 32): Exception("Line " + str(i) + " is the wrong number of bits")    
+    print(len(lines[i]))
+
+    if((len(lines[i]) != 32) and (len(lines[i]) != 16)):
+        raise Exception("Line " + str(i) + " is the wrong number of bits")    
     
     lines[i] = wrap(lines[i],8)
     lines[i].reverse()
