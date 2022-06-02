@@ -246,6 +246,7 @@ begin
             rs1_c <= ( "00" & instruction_in(9 downto 7))+8;
             rs2_c <= instruction_in(6 downto 2);
             funct7_c <= "000000" & instruction_in(12);
+            -- c.lui?
         elsif(instruction_in(1 downto 0) = "01" and instruction_in(15 downto 13) = "011") then
             opcode_c <= "0110111";
             rd_c <= instruction_in(11 downto 7);
