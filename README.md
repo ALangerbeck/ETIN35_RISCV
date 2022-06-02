@@ -5,12 +5,6 @@
 Project repository for the second project in the course IC-Project 1 given at LTH spting 2022
 
 ## Still to be tested
-	- beq  
-	- bne
-	- blt
-	- bge
-	- bltu
-	- bgeu 
 	- c.Lw
 	- c.SW
 	- c.ADD
