@@ -5,22 +5,7 @@
 Project repository for the second project in the course IC-Project 1 given at LTH spting 2022
 
 ## Still to be tested
-	- c.Lw
-	- c.SW
-	- c.ADD
-	- c.ADDI
-	- c.SUB
-	- c.AND
-	- c.ANDI
-	- c.OR
-	- c.XOR
-	- c.MV
-	- c.LI
-	- c.LUI
-	- c.SLLI
-	- c.SRAI
-	- c.SRLI
-	- c.nop
+	- none
 ## Currently implemented instructions
 
 - R-format - performs register to register operations
