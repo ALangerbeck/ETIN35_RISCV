@@ -8,7 +8,7 @@ Project repository for the second project in the course IC-Project 1 given at LT
 
 Run assembler with  
 
-	- python .\assembler_with_compressed.py <assebly code file> 
+	python .\assembler_with_compressed.py <assebly code file> 
 
 this will output a output.mem in the same directory
 
