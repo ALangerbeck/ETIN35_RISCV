@@ -1,0 +1,5 @@
+    addi 1 0 10
+    addi 2 0 1
+BEGIN:
+    sub 1 1 2
+    beq 1 0 BEGIN
