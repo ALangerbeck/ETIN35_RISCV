@@ -280,6 +280,7 @@ begin
         elsif(reg_block_two_out.mux_ex_one = FORWARD_MEM_WB) then
             operand_one <= wb_result;
         end if;
+        
         if(reg_block_two_out.mux_ex_two = FORWARD_NONE) then
             operand_two <= reg_block_two_out.data_two;
         elsif(reg_block_two_out.mux_ex_two = FORWARD_EX_MEM) then

@@ -14,7 +14,6 @@ import risc_v_32_constants as constants
 from textwrap import wrap
 
 lines, lineinfo, lineadr, labels, empty = [], [], [], {}, []
-LINEINFO_NONE, LINEINFO_ORG, LINEINFO_BEGIN, LINEINFO_END	= 0x00000, 0x10000, 0x20000, 0x40000
 DEBUG = False
 
 
@@ -30,15 +29,7 @@ f.close()
 
 
 for i in range(len(lines)):                         # PASS 1: do PER LINE replacements
-    while(lines[i].find('\'') != -1):               # replace '...' occurances with corresponding ASCII code(s)
-        k = lines[i].find('\'')
-        l = lines[i].find('\'', k+1)
-        if k != -1 and l != -1:
-            replaced = ''
-            for c in lines[i][k+1:l]: replaced += str(ord(c)) + ' '
-            lines[i] = lines[i][0:k] + replaced + lines[i][l+1:]
-        else: break
-
+    
     if (lines[i].find(';') != -1): lines[i] = lines[i][0:lines[i].find(';')]    # delete comments
     lines[i] = lines[i].replace(',', ' ')                                       # replace commas with spaces
 
@@ -105,7 +96,6 @@ for i in range(len(lines)):
     elif opcode == '0110011':
         if(len(lines[i]) != 4 ):
             raise Exception("Expecting 3 arguments for " + lineinfo[i] + " around line " + str(i+1))
-        lines[i][1]
         rd = "{:05b}".format(int(lines[i][1]))
         rs1 = "{:05b}".format(int(lines[i][2]))
         rs2 = "{:05b}".format(int(lines[i][3]))
@@ -179,7 +169,7 @@ for i in range(len(lines)):
             r2 = rs2p
         lines[i] = [opcode,r1,uimm[4]+uimm[0],r2,uimm[1:4],funct]
     
-    elif opcode == "10": #compressed add,
+    elif opcode == "10": #compressed add,mv slli
         rd = "{:05b}".format(int(lines[i][1]))
         funct = constants.memonicToFunct[lineinfo[i]]
         if lineinfo[i] in ["c.add","c.mv"]:

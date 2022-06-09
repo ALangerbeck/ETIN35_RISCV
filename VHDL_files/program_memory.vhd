@@ -39,7 +39,8 @@ architecture behavioral of program_memory is
     
     signal ram: ram_type := initRAM("../Assembler/output.mem");
     alias word_address: std_logic_vector(PROGRAM_ADDRESS_WIDTH-1 downto 0) is address(PROGRAM_ADDRESS_WIDTH-1 downto 0);
-
+    
+    
 begin
 
     instruction_ram: process (clk) is
